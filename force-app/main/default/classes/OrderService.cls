@@ -5,7 +5,7 @@ public with sharing class OrderService {
         Savepoint sp = Database.setSavepoint();
 
         try {
-            order__c newOrder = createOrderRecord(orderResponse);
+            order__c newOrder = OrderRepository.createOrderRecord(orderResponse);
 
             OrderItemService.InsertResult insertResult = OrderItemService.insertOrderItems(orderResponse.items, newOrder.Id);
 
@@ -29,26 +29,5 @@ public with sharing class OrderService {
         return result;
     }
 
-    private order__c createOrderRecord(OrderResponseWrapper orderResponse) {
-        order__c newOrder = new order__c();
-        newOrder.AccountId__c = orderResponse.accountId;
-        newOrder.status__c = 'Draft';
-        newOrder.billing_street__c = orderResponse.billingInfo.street;
-        newOrder.billing_city__c = orderResponse.billingInfo.city;
-        newOrder.billing_country__c = orderResponse.billingInfo.country;
-        newOrder.billing_email__c = orderResponse.billingInfo.email;
-        newOrder.order_amount__c = orderResponse.orderAmount;
-        newOrder.PO_number__c = orderResponse.poNumber;
-
-        if (!String.isBlank(orderResponse.poDate)) {
-            newOrder.PO_date__c = Date.valueOf(orderResponse.poDate);
-        }
-
-        if (!String.isBlank(orderResponse.orderStartDate)) {
-            newOrder.order_start_date__c = Date.valueOf(orderResponse.orderStartDate);
-        }
-
-        insert newOrder;
-        return newOrder;
-    }
+    
 }

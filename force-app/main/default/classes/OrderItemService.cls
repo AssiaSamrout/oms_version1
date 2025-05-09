@@ -9,12 +9,6 @@ public with sharing class OrderItemService {
         if (!order_item__c.SObjectType.getDescribe().isCreateable()) {
             throw new SecurityException('OrderItem object not creatable');
         }
-        if (!Product2.SObjectType.getDescribe().isAccessible()) {
-            throw new SecurityException('Product2 object not accessible');
-        }
-        if (!Schema.Product2.StockKeepingUnit.getDescribe().isAccessible()) {
-            throw new SecurityException('Product2 SKU field not accessible');
-        }
 
         validateInput(items);
 
@@ -23,13 +17,13 @@ public with sharing class OrderItemService {
             skus.add(item.sku);
         }
 
-        Map<String, Product2> skuToProductMap = findProductBySKU(skus);
+        Map<String, Product2> skuToProductMap = Product2Repository.findProductBySKU(skus);
         validateSkus(skus, skuToProductMap.keySet());
 
         List<order_item__c> orderItems = buildOrderItems(items, skuToProductMap, orderId);
 
         InsertResult result = new InsertResult();
-        Database.SaveResult[] saveResults = Database.insert(orderItems, false);
+        Database.SaveResult[] saveResults = OrderItemRepository.insertItems(orderItems, false);
 
         for (Integer i = 0; i < saveResults.size(); i++) {
             if (saveResults[i].isSuccess()) {
@@ -51,15 +45,6 @@ public with sharing class OrderItemService {
                 throw new IllegalArgumentException('SKU cannot be blank');
             }
         }
-    }
-
-    public static Map<String, Product2> findProductBySKU(Set<String> skuSet) {
-        List<Product2> products = [SELECT Id, StockKeepingUnit FROM Product2 WHERE StockKeepingUnit IN :skuSet];
-        Map<String, Product2> skuToProductMap = new Map<String, Product2>();
-        for (Product2 product : products) {
-            skuToProductMap.put(product.StockKeepingUnit, product);
-        }
-        return skuToProductMap;
     }
 
     public static void validateSkus(Set<String> givenSKU, Set<String> foundSKU) {
