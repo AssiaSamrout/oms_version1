@@ -67,6 +67,26 @@ public with sharing class OrderItemCreationTest {
     }
 
     @isTest
+    static void testOrderItems_WrongData(){
+      List<OrderResponseWrapper.Item> items = new List<OrderResponseWrapper.Item>();
+        OrderResponseWrapper.Item item = new OrderResponseWrapper.Item();
+        item.sku = 'SKU1';
+        item.productName = 'Test Product';
+        item.quantity = 1;
+        item.unitPrice = null;
+        item.totalPrice = 100.00;
+        item.description = 'Test Description';
+        items.add(item);
+        Id orderId = [Select Id from order__c limit 1].Id;
+        Test.startTest();
+        OrderItemService.InsertResult result = OrderItemService.insertOrderItems(items, orderId);
+        System.assertEquals(0, result.successfulItems.size(), 'Successful items count should be 0');
+        System.assertEquals(1, result.errors.size(),'error count should be 1');
+        
+        Test.stopTest();
+    }
+
+    @isTest
     static void testOrderItem_invalidSKU(){
         List<OrderResponseWrapper.Item> items = new List<OrderResponseWrapper.Item>();
         OrderResponseWrapper.Item item = new OrderResponseWrapper.Item();
