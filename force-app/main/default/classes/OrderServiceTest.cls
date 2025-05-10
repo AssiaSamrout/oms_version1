@@ -68,7 +68,7 @@ private class OrderServiceTest {
     }
 
     @isTest
-    static void testCreateOrder_success() {
+    static void testCreateOrdersuccess() {
         OrderResponseWrapper wrapper = buildValidOrderResponse();
 
         Test.startTest();
@@ -87,18 +87,17 @@ private class OrderServiceTest {
     }
 
     @isTest
-    static void testCreateOrder_itemInsertFailure() {
-        createProduct('SKU123');
+    static void testCreateOrderitemInsertFailure() {
+         OrderResponseWrapper wrapper = buildValidOrderResponse();
 
         OrderResponseWrapper.Item badItem = new OrderResponseWrapper.Item();
-        badItem.sku = 'INVALID_SKU';
+        badItem.sku = 'SKU123';
         badItem.productName = 'Invalid Product';
         badItem.quantity = 1;
-        badItem.unitPrice = 10;
+        badItem.unitPrice = null;
         badItem.totalPrice = 10;
-        badItem.description = 'Bad SKU';
+        badItem.description = 'dddddd  ggrgrtbb';
 
-        OrderResponseWrapper wrapper = new OrderResponseWrapper();
         wrapper.items = new List<OrderResponseWrapper.Item>{ badItem };
 
         Test.startTest();
@@ -106,13 +105,18 @@ private class OrderServiceTest {
         OrderProcessingResult result = service.createOrder(wrapper);
         Test.stopTest();
 
+        System.debug('inside failure test:'+result.success);
+        System.debug('inside failure test:'+result.message);
+        System.debug('Order ID: ' + result.orderId);
         System.assertEquals(false, result.success,'result should be false');
         System.assert(result.message.contains('Some order items failed to insert'),'message should contain error message');
         System.assertEquals(null, result.orderId,'orderId should be null');
     }
 
     @isTest
-    static void testCreateOrder_exceptionThrown() {
+    static void testCreateOrderexceptionThrown() {
+
+        //this works also if the sku is not present in the database
         Test.startTest();
         OrderService service = new OrderService();
         OrderProcessingResult result = service.createOrder(null);

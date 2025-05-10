@@ -67,7 +67,7 @@ public with sharing class OrderItemCreationTest {
     }
 
     @isTest
-    static void testOrderItems_WrongData(){
+    static void testOrderItemsWrongData(){
       List<OrderResponseWrapper.Item> items = new List<OrderResponseWrapper.Item>();
         OrderResponseWrapper.Item item = new OrderResponseWrapper.Item();
         item.sku = 'SKU1';
@@ -87,7 +87,7 @@ public with sharing class OrderItemCreationTest {
     }
 
     @isTest
-    static void testOrderItem_invalidSKU(){
+    static void testOrderIteminvalidSKU(){
         List<OrderResponseWrapper.Item> items = new List<OrderResponseWrapper.Item>();
         OrderResponseWrapper.Item item = new OrderResponseWrapper.Item();
         item.sku = 'fffff';

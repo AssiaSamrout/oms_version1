@@ -1,9 +1,8 @@
 public with sharing class OrderEventPublisher {
     
     public static void publishOrderCreatedEvent(order__c order){
-        Order_Ready_For_Payment__e event = new Order_Ready_For_Payment__e(
-            orderId__c = order.Id,
-            orderTotalAmount__c = order.order_amount__c
+        OrderCreated__e event = new OrderCreated__e(
+            orderId__c = order.Id
         );
 
         Database.SaveResult result = EventBus.publish(event);
