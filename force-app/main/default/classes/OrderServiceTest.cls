@@ -6,6 +6,9 @@ private class OrderServiceTest {
         Product2 product = new Product2(Name='Test Product', StockKeepingUnit=sku, IsActive=true);
         insert product;
 
+        Account account = new Account(Name='Test Account');
+        insert account;
+
         OrderResponseWrapper.Item item = new OrderResponseWrapper.Item();
         item.sku = sku;
         item.productName = 'Test Product';
@@ -43,7 +46,7 @@ private class OrderServiceTest {
         OrderResponseWrapper wrapper = new OrderResponseWrapper();
         wrapper.orderName = 'Test Order';
         wrapper.orderDate = String.valueOf(Date.today());
-        wrapper.accountId = UserInfo.getUserId(); 
+        wrapper.accountId = account.Id; 
         wrapper.orderStartDate = String.valueOf(Date.today());
         wrapper.poNumber = 'PO12345';
         wrapper.poDate = String.valueOf(Date.today());
@@ -70,12 +73,17 @@ private class OrderServiceTest {
 
         Test.startTest();
         OrderService service = new OrderService();
+        System.debug('Wrapper item SKU: ' + wrapper.items[0].sku);
+
         OrderProcessingResult result = service.createOrder(wrapper);
         Test.stopTest();
-
+        System.debug('inside success test:'+result.message);
+        System.debug('Order ID: ' + result.orderId);
         System.assertEquals(true, result.success,'result should be true');
         System.assertNotEquals(null, result.orderId,'orderId should not be null');
         System.assert(result.message.contains('Order created successfully'),'message should contain success message');  
+        
+
     }
 
     @isTest
