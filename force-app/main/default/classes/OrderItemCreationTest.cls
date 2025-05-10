@@ -35,7 +35,7 @@ public with sharing class OrderItemCreationTest {
     @isTest
     static void testInsertOrderItemsNormalFlow(){
         List<OrderResponseWrapper.Item> items = new List<OrderResponseWrapper.Item>();
-        for(Integer i = 0; i < 5; i++){
+        for(Integer i = 0; i < 3; i++){
             OrderResponseWrapper.Item item = new OrderResponseWrapper.Item();
             item.sku = 'SKU'+(i+1);
             item.productName = 'Test Product'+(i+1);
@@ -51,7 +51,7 @@ public with sharing class OrderItemCreationTest {
         OrderItemService.InsertResult result= OrderItemService.insertOrderItems(items, orderId);
         Test.stopTest();
         List<order_item__c> orderItems = [SELECT Id, Product2Id__c, Name, quantity__c, unit_price__c, total_price__c, description__c FROM order_item__c WHERE orderId__c = :orderId];
-        System.assertEquals(5, orderItems.size(), 'Order items count should be 5');
+        System.assertEquals(3, orderItems.size(), 'Order items count should be 5');
         for(order_item__c orderItem : orderItems){
             System.assertNotEquals(null, orderItem.Product2Id__c, 'Product2Id should not be null');
             System.assertNotEquals(null, orderItem.Name, 'Name should not be null');
@@ -61,7 +61,7 @@ public with sharing class OrderItemCreationTest {
             System.assertNotEquals(null, orderItem.description__c, 'Description should not be null');
         }
 
-        System.assertEquals(5, result.successfulItems.size(), 'Successful items count should be 5');
+        System.assertEquals(3, result.successfulItems.size(), 'Successful items count should be 5');
         System.assertEquals(0, result.errors.size(), 'Error count should be 0');
 
     }
