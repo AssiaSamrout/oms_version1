@@ -2,8 +2,12 @@
 public with sharing class OrderItemCreationTest {
     @TestSetup
     static void makeData(){
+        Account acc = new Account();
+        acc.Name = 'Test Account';
+        acc.Phone = '1234567890';
+        insert acc;
         order__c order = new order__c();
-        order.AccountId__c = '001XXXXXXXXXXXXXXX';  
+        order.AccountId__c = acc.Id;  
         order.status__c = 'Draft';
         order.billing_street__c = '123 Main St';
         order.billing_city__c = 'San Francisco';
