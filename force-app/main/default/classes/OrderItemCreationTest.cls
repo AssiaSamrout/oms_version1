@@ -79,11 +79,14 @@ public with sharing class OrderItemCreationTest {
         items.add(item);
         Id orderId = [Select Id from order__c limit 1].Id;
         Test.startTest();
+        try{
         OrderItemService.InsertResult result = OrderItemService.insertOrderItems(items, orderId);
+        System.assert(false, 'Expected IllegalArgumentException for invalid SKU');
+        } catch (IllegalArgumentException e) {
+            System.assertEquals('Invalid SKUs: fffff', e.getMessage(),'exception thrown');
+        }
         Test.stopTest();
-        System.assertEquals(0, result.successfulItems.size(), 'Successful items count should be 0');
-        System.assertEquals(1, result.errors.size(), 'Error count should be 1');
-        System.assertEquals('Invalid SKUs: fffff', result.errors[0], 'Error message should match');
+        
     }
 
     @isTest
