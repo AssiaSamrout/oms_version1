@@ -25,4 +25,20 @@ public with sharing class OrderRepository {
         }
         return newOrder;
     }
+
+    public static order__c getOrderById(Id orderId) {
+        if (orderId == null) {
+            throw new IllegalArgumentException('Order ID cannot be null');
+        }
+
+        if(!order__c.SObjectType.getDescribe().isAccessible()) {
+            throw new SecurityException('Order object not accessible');
+        }
+        List<order__c> orders = [SELECT Id, Name,SubTotal__c, AccountId__c, status__c, billing_street__c, billing_city__c, billing_country__c, billing_email__c, order_amount__c, PO_number__c, PO_date__c, order_start_date__c
+                                 FROM order__c
+                                 WHERE Id = :orderId];
+
+        return orders[0];
+    }
+
 }

@@ -1,0 +1,74 @@
+public with sharing class CouponService {
+    public static coupon__c getCouponByCouponCode(String code) {
+        if(String.isBlank(code)) {
+            throw new IllegalArgumentException('Coupon code cannot be null or empty');
+        }
+
+        if(!coupon__c.SObjectType.getDescribe().isAccessible()){
+            throw new SecurityException('Coupon object not accessible');
+        }
+        List<coupon__c> results = [
+            SELECT Id, Name, Code__c,UsageLimit__c, UsageCount__c,
+                   Expiration_Date__c, PromotionId__r.Id, PromotionId__r.Name,
+                   PromotionId__r.DiscountValue__c, PromotionId__r.Type__c
+            FROM coupon__c
+            WHERE Code__c = :code
+           //   AND (UsageLimit__c = null OR UsageCount__c < UsageLimit__c)
+            LIMIT 1
+        ];
+        return results.isEmpty() ? null : results[0];
+    }
+
+
+    public static Boolean validateCoupon(coupon__c coupon){
+        if(coupon == null) {
+            throw new IllegalArgumentException('Coupon cannot be null');
+        }
+        if(coupon.IsActive__c == false){
+            throw new IllegalArgumentException('Coupon is not active');
+        }
+
+        if(coupon.Expiration_Date__c != null && coupon.Expiration_Date__c < System.now()) {
+            throw new IllegalArgumentException('Coupon has expired');
+        }
+
+        if(coupon.UsageLimit__c != null && coupon.UsageCount__c >= coupon.UsageLimit__c) {
+            changeIsActive(coupon, false);
+            throw new IllegalArgumentException('Coupon usage limit reached');
+        }
+        if(coupon.PromotionId__r == null) {
+            throw new IllegalArgumentException('Promotion name cannot be null');
+        }
+
+        return true;
+
+    }
+
+    public static void incrementUsageCount(coupon__c coupon){
+        if(!coupon__c.SObjectType.getDescribe().isUpdateable()){
+            throw new SecurityException('Coupon object not updatable');
+        }
+        if(coupon == null){
+            throw new IllegalArgumentException('Coupon cannot be null');
+        }
+        if(coupon.UsageCount__c == null && coupon.UsageLimit__c == null){
+            throw new IllegalArgumentException('usage limit and usage count are unavailable');
+        }
+        coupon.UsageCount__c = (coupon.UsageCount__c == null ? 0 : coupon.UsageCount__c+1);
+
+        update coupon;
+    }
+
+    public static void changeIsActive(coupon__c coupon, Boolean isActive){
+        if(!coupon__c.SObjectType.getDescribe().isUpdateable()){
+            throw new SecurityException('Coupon object not updatable');
+        }
+        if(coupon == null){
+            throw new IllegalArgumentException('Coupon cannot be null');
+        }
+        coupon.IsActive__c = isActive;
+        update coupon;
+    }
+
+
+}

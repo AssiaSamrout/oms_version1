@@ -29,5 +29,19 @@ public with sharing class OrderService {
         return result;
     }
 
+    public static order__c getOrderById(Id orderId){
+        if (orderId == null) {
+            System.debug('inside OrderService: Order ID cannot be null');
+            throw new IllegalArgumentException('Order ID cannot be null');
+        }
+
+        order__c order = OrderRepository.getOrderById(orderId);
+        if (order == null) {
+            System.debug('inside OrderService: Order not found with ID: ' + orderId);
+            throw new IllegalArgumentException('Order not found with ID: ' + orderId);
+        }
+
+        return order;
+    }
     
 }

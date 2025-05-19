@@ -76,4 +76,19 @@ public with sharing class OrderItemService {
         }
         return orderItems;
     }
+
+    public static List<order_item__c> getOrderItemsByOrderId(Id orderId) {
+        if (orderId == null) {
+            System.debug('inside OrderItemService: Order ID cannot be null');
+            throw new IllegalArgumentException('Order ID cannot be null');
+        }
+
+        List<order_item__c> orderItems = OrderItemRepository.getOrderItemsByOrderId(orderId);
+        if (orderItems == null || orderItems.isEmpty()) {
+            System.debug('inside OrderItemService: Order items not found for Order ID: ' + orderId);
+            throw new IllegalArgumentException('Order items not found for Order ID: ' + orderId);
+        }
+
+        return orderItems;
+    }
 }
