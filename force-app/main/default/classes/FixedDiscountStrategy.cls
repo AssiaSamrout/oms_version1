@@ -9,6 +9,7 @@ public with sharing class FixedDiscountStrategy implements IDiscountStrategy {
         if (promotion.DiscountValue__c < 0) {
             throw new IllegalArgumentException('Discount value cannot be negative');
         }
+
         return promotion.DiscountValue__c;
     }
     

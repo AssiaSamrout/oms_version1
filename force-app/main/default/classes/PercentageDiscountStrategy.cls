@@ -14,7 +14,8 @@ public with sharing class PercentageDiscountStrategy implements IDiscountStrateg
             throw new IllegalArgumentException('Total cannot be null');
         }
 
-        return (total * promotion.Percentage__c) / 100;
+        Decimal discountAmount = (total * promotion.Percentage__c) / 100;
+        return discountAmount;
 
     }
 
