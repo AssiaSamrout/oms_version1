@@ -91,4 +91,19 @@ public with sharing class OrderItemService {
 
         return orderItems;
     }
+
+    public static Decimal adjustTotalAmount(Decimal totalItemAmount, Decimal adjustment) {
+        if (adjustment == null) {
+            throw new IllegalArgumentException('Adjustment cannot be null');
+        }
+        return totalItemAmount - adjustment;
+    }
+
+    public static calculateTotalItemAmount(Integer quantity, Decimal unitPrice) {
+        if (quantity == null || unitPrice == null) {
+            throw new IllegalArgumentException('Quantity and Unit Price cannot be null');
+        }
+        return quantity * unitPrice;
+    }
+
 }

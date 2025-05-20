@@ -43,5 +43,20 @@ public with sharing class OrderService {
 
         return order;
     }
+
+    public static Decimal calculateTotalAmount(List<order_item__c> orderItems) {
+        Decimal totalAmount = 0;
+        for (order_item__c item : orderItems) {
+            totalAmount += item.unit_price__c * item.quantity__c;
+        }
+        return totalAmount;
+    }
+
+    public static Decimal adjustTotalAmount(Decimal totalAmount, Decimal adjustment) {
+        if (adjustment == null) {
+            throw new IllegalArgumentException('Adjustment cannot be null');
+        }
+        return totalAmount - adjustment;
+    }
     
 }
