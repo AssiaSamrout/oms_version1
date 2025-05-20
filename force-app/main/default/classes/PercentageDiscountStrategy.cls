@@ -21,6 +21,9 @@ public with sharing class PercentageDiscountStrategy implements IDiscountStrateg
     private Decimal getTotalitems(List<order_item__c> orderItems, Id productId){
         Decimal total = 0;
         for(order_item__c item : orderItems){
+            if(item.Product2Id__c != productId) {
+                continue;
+            }
             total+= (item.unit_price__c * item.quantity__c);
         }
         return total;

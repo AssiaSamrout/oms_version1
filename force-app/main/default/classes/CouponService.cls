@@ -19,6 +19,25 @@ public with sharing class CouponService {
         return results.isEmpty() ? null : results[0];
     }
 
+    public static List<coupon__c> getCouponsByCouponCodes(List<String> codes) {
+        if(codes == null || codes.isEmpty()) {
+            throw new IllegalArgumentException('Coupon codes cannot be null or empty');
+        }
+
+        if(!coupon__c.SObjectType.getDescribe().isAccessible()){
+            throw new SecurityException('Coupon object not accessible');
+        }
+        List<coupon__c> results = [
+            SELECT Id, Name, Code__c,UsageLimit__c, UsageCount__c,
+                   Expiration_Date__c, PromotionId__r.Id, PromotionId__r.Name,
+                   PromotionId__r.DiscountValue__c, PromotionId__r.Type__c
+            FROM coupon__c
+            WHERE Code__c IN :codes
+            LIMIT 1
+        ];
+        return results;
+    }
+
 
     public static Boolean validateCoupon(coupon__c coupon){
         if(coupon == null) {

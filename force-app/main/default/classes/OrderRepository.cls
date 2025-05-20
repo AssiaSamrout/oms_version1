@@ -7,7 +7,7 @@ public with sharing class OrderRepository {
         newOrder.billing_city__c = orderResponse.billingInfo.city;
         newOrder.billing_country__c = orderResponse.billingInfo.country;
         newOrder.billing_email__c = orderResponse.billingInfo.email;
-        newOrder.order_amount__c = orderResponse.orderAmount;
+        newOrder.SubTotal__c = orderResponse.orderAmount;
         newOrder.PO_number__c = orderResponse.poNumber;
 
         if (!String.isBlank(orderResponse.poDate)) {

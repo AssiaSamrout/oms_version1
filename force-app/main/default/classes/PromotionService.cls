@@ -8,7 +8,7 @@ public with sharing class PromotionService {
 
         List<promotion__c> promotions = [
             SELECT Id, Name, Percentage__c, RecordTypeId, RecordType.Name, DiscountValue__c, 
-                   isAutomatic__c, Type__c, activeFrom__c, activeTo__c
+                   isAutomatic__c, Type__c, activeFrom__c, activeTo__c,	productId__c
             FROM promotion__c
             WHERE Id = :promotionId
             LIMIT 1
