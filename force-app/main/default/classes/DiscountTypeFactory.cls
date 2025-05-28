@@ -4,7 +4,7 @@ public with sharing class DiscountTypeFactory {
             System.debug('inside percentage discount strategy factory');
             return new PercentageDiscountStrategy();
         }
-        if(promotion.Type__c == 'Fixed'){
+        if(promotion.Type__c == 'Fixed amount'){
             System.debug('inside Fixed discount strategy factory');
             return new FixedDiscountStrategy();
         }

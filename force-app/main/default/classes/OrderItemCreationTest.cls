@@ -34,9 +34,9 @@ public with sharing class OrderItemCreationTest {
        
     @isTest
     static void testInsertOrderItemsNormalFlow(){
-        List<OrderResponseWrapper.Item> items = new List<OrderResponseWrapper.Item>();
+        List<ItemDTO> items = new List<ItemDTO>();
         for(Integer i = 0; i < 3; i++){
-            OrderResponseWrapper.Item item = new OrderResponseWrapper.Item();
+            ItemDTO item = new ItemDTO();
             item.sku = 'SKU'+(i+1);
             item.productName = 'Test Product'+(i+1);
             item.quantity = 1;
@@ -68,8 +68,8 @@ public with sharing class OrderItemCreationTest {
 
     @isTest
     static void testOrderItemsWrongData(){
-      List<OrderResponseWrapper.Item> items = new List<OrderResponseWrapper.Item>();
-        OrderResponseWrapper.Item item = new OrderResponseWrapper.Item();
+      List<ItemDTO> items = new List<ItemDTO>();
+        ItemDTO item = new ItemDTO();
         item.sku = 'SKU1';
         item.productName = 'Test Product';
         item.quantity = 1;
@@ -88,8 +88,8 @@ public with sharing class OrderItemCreationTest {
 
     @isTest
     static void testOrderIteminvalidSKU(){
-        List<OrderResponseWrapper.Item> items = new List<OrderResponseWrapper.Item>();
-        OrderResponseWrapper.Item item = new OrderResponseWrapper.Item();
+        List<ItemDTO> items = new List<ItemDTO>();
+        ItemDTO item = new ItemDTO();
         item.sku = 'fffff';
         item.productName = 'Test Product';
         item.quantity = 1;
@@ -111,7 +111,7 @@ public with sharing class OrderItemCreationTest {
 
     @isTest
     static void testInsertOrderItemsInvalidSKU(){
-        OrderResponseWrapper.Item item = new OrderResponseWrapper.Item();
+        ItemDTO item = new ItemDTO();
         item.sku = '';
         item.productName = 'Test Product';
         item.quantity = 1;
@@ -123,7 +123,7 @@ public with sharing class OrderItemCreationTest {
 
         Test.startTest();
         try {
-           OrderItemService.InsertResult result = OrderItemService.insertOrderItems(new List<OrderResponseWrapper.Item>{item}, orderId);
+           OrderItemService.InsertResult result = OrderItemService.insertOrderItems(new List<ItemDTO>{item}, orderId);
             System.assert(false, 'Expected IllegalArgumentException for blank SKU');
         } catch (IllegalArgumentException e) {
             System.assertEquals('SKU cannot be blank', e.getMessage(),'exception thrown');

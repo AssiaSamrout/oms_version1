@@ -1,6 +1,7 @@
 public with sharing class PromotionRulesEngine {
     
     public static PromotionEligibilityResult isEligible(order__c order, List<order_item__c> orderItems, promotion__c promotion) {
+       
         PromotionEligibilityResult result = new PromotionEligibilityResult(true);
         System.debug('inside promotionengine first log');
         System.debug(promotion.RecordType.Name);
@@ -13,6 +14,7 @@ public with sharing class PromotionRulesEngine {
         if(!Schema.SObjectType.promotion__c.isAccessible()) {
             throw new SecurityException('Promotion object not accessible');
         }
+        try{
 		System.debug('before getting the rules');
         List<PromotionEligibilityRules__mdt> rules = getAllRules(promotion);
 		System.debug('fetched rules inside promotionRulesEngine'+rules[0]);
@@ -30,10 +32,15 @@ public with sharing class PromotionRulesEngine {
             if(!ruleInstance.isEligible(order, orderItems, promotion)){
                 result.isEligible = false;
                 result.failureReasons.add(promorule.RuleName__c + ' is not applicable on this order');
+
                 System.debug('i entered to not eligible condition');
                 return result;
             }
         }
+    }catch(Exception e){
+        System.debug('Exception in PromotionRulesEngine: ' + e.getMessage());
+        throw new PromoException('Error evaluating promotion eligibility: ' + e.getMessage());
+    }
 
         return result;
     }

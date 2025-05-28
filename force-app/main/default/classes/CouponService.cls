@@ -8,7 +8,7 @@ public with sharing class CouponService {
             throw new SecurityException('Coupon object not accessible');
         }
         List<coupon__c> results = [
-            SELECT Id, Name, Code__c,UsageLimit__c, UsageCount__c,
+            SELECT Id, Name, Code__c,UsageLimit__c, UsageCount__c,IsActive__c,
                    Expiration_Date__c, PromotionId__r.Id, PromotionId__r.Name,
                    PromotionId__r.DiscountValue__c, PromotionId__r.Type__c
             FROM coupon__c
@@ -28,12 +28,11 @@ public with sharing class CouponService {
             throw new SecurityException('Coupon object not accessible');
         }
         List<coupon__c> results = [
-            SELECT Id, Name, Code__c,UsageLimit__c, UsageCount__c,
+            SELECT Id, Name, Code__c,UsageLimit__c, UsageCount__c,IsActive__c,
                    Expiration_Date__c, PromotionId__r.Id, PromotionId__r.Name,
                    PromotionId__r.DiscountValue__c, PromotionId__r.Type__c
             FROM coupon__c
             WHERE Code__c IN :codes
-            LIMIT 1
         ];
         return results;
     }
@@ -44,19 +43,19 @@ public with sharing class CouponService {
             throw new IllegalArgumentException('Coupon cannot be null');
         }
         if(coupon.IsActive__c == false){
-            throw new IllegalArgumentException('Coupon is not active');
+            return false;
         }
 
         if(coupon.Expiration_Date__c != null && coupon.Expiration_Date__c < System.now()) {
-            throw new IllegalArgumentException('Coupon has expired');
+            return false;
         }
 
         if(coupon.UsageLimit__c != null && coupon.UsageCount__c >= coupon.UsageLimit__c) {
             changeIsActive(coupon, false);
-            throw new IllegalArgumentException('Coupon usage limit reached');
+            return false;
         }
         if(coupon.PromotionId__r == null) {
-            throw new IllegalArgumentException('Promotion name cannot be null');
+            return false;
         }
 
         return true;

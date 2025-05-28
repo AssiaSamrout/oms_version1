@@ -5,7 +5,7 @@ public with sharing class OrderItemService {
         public List<String> errors = new List<String>();
     }
 
-    public static InsertResult insertOrderItems(List<OrderResponseWrapper.Item> items, Id orderId) {
+    public static InsertResult insertOrderItems(List<ItemDTO> items, Id orderId) {
         if (!order_item__c.SObjectType.getDescribe().isCreateable()) {
             throw new SecurityException('OrderItem object not creatable');
         }
@@ -13,7 +13,7 @@ public with sharing class OrderItemService {
         validateInput(items);
 
         Set<String> skus = new Set<String>();
-        for (OrderResponseWrapper.Item item : items) {
+        for (ItemDTO item : items) {
             skus.add(item.sku);
         }
 
@@ -39,8 +39,8 @@ public with sharing class OrderItemService {
         return result;
     }
 
-    private static void validateInput(List<OrderResponseWrapper.Item> items) {
-        for (OrderResponseWrapper.Item item : items) {
+    private static void validateInput(List<ItemDTO> items) {
+        for (ItemDTO item : items) {
             if (String.isBlank(item.sku)) {
                 throw new IllegalArgumentException('SKU cannot be blank');
             }
@@ -55,9 +55,9 @@ public with sharing class OrderItemService {
         }
     }
 
-    private static List<order_item__c> buildOrderItems(List<OrderResponseWrapper.Item> items, Map<String, Product2> skuMap, Id orderId) {
+    private static List<order_item__c> buildOrderItems(List<ItemDTO> items, Map<String, Product2> skuMap, Id orderId) {
         List<order_item__c> orderItems = new List<order_item__c>();
-        for (OrderResponseWrapper.Item item : items) {
+        for (ItemDTO item : items) {
             Product2 product = skuMap.get(item.sku);
             if (product == null){ 
             continue;
@@ -99,7 +99,7 @@ public with sharing class OrderItemService {
         return totalItemAmount - adjustment;
     }
 
-    public static calculateTotalItemAmount(Integer quantity, Decimal unitPrice) {
+    public static Decimal calculateTotalItemAmount(Integer quantity, Decimal unitPrice) {
         if (quantity == null || unitPrice == null) {
             throw new IllegalArgumentException('Quantity and Unit Price cannot be null');
         }

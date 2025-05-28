@@ -8,7 +8,7 @@ public with sharing class PromotionService {
 
         List<promotion__c> promotions = [
             SELECT Id, Name, Percentage__c, RecordTypeId, RecordType.Name, DiscountValue__c, 
-                   isAutomatic__c, Type__c, activeFrom__c, activeTo__c,	productId__c
+                   isAutomatic__c, Type__c, activeFrom__c, activeTo__c,	productId__c,Description__c
             FROM promotion__c
             WHERE Id = :promotionId
             LIMIT 1
@@ -29,7 +29,7 @@ public with sharing class PromotionService {
 
         return [
             SELECT Id, Name, Percentage__c, RecordTypeId, RecordType.Name, DiscountValue__c, 
-                   isAutomatic__c, Type__c, activeFrom__c, activeTo__c
+                   isAutomatic__c, Type__c, activeFrom__c, activeTo__c,Description__c
             FROM promotion__c
             WHERE Id IN :promotionIds
         ];
@@ -39,7 +39,7 @@ public with sharing class PromotionService {
         if(!promotion__c.SObjectType.getDescribe().isAccessible()) {
             throw new SecurityException('Promotion object not accessible');
         }
-        return [SELECT Id, Name, Percentage__c, RecordType.Name,DiscountValue__c, isAutomatic__c, Type__c, activeFrom__c, activeTo__C
+        return [SELECT Id, Name, Percentage__c, RecordType.Name,DiscountValue__c, isAutomatic__c, Type__c, activeFrom__c, activeTo__C,Description__c
                 FROM promotion__c
                 WHERE isAutomatic__c = true
                 AND activeFrom__c <= :Date.today()

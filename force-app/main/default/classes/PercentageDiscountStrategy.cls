@@ -13,8 +13,9 @@ public with sharing class PercentageDiscountStrategy implements IDiscountStrateg
         if(total == null) {
             throw new IllegalArgumentException('Total cannot be null');
         }
-
+        System.debug('Total amount for discount calculation in percentage strategy: ' + total);
         Decimal discountAmount = (total * promotion.Percentage__c) / 100;
+        System.debug('Calculated discount amount in percentage strategy: ' + discountAmount);
         return discountAmount;
 
     }
