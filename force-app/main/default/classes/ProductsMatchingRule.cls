@@ -13,5 +13,18 @@ public with sharing class ProductsMatchingRule implements IPromotionRule {
 
         return false; // No match found
     }
+
+    // public Boolean isEligible(PromotionEvaluationContext context) {
+    //     if (context.promotion.productId__c == null) {
+    //         return false;
+    //     }
+
+    //     List<order_item__c> items = context.orderItemsByPromotionId.get(context.promotion.productId__c);
+    //     if (items != null && !items.isEmpty()) {
+    //         return true; 
+    //     }
+
+    //     return false;
+    // }
     
 }
