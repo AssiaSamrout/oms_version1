@@ -43,13 +43,23 @@ public with sharing class ItemLevelPromotionHandler implements IPromotionLevelHa
         Decimal totalDiscount = 0;
         List<order_item__c> updatedItems = new List<order_item__c>();
 
-        for (order_item__c orderItem : orderItems) {
-            if (promotion.productId__c == orderItem.Product2Id__c) {
-                orderItem.AdjustmentsAmount__c = orderItem.total_price__c - discount;
-                totalDiscount += discount;
-                updatedItems.add(orderItem);
-            }
-        }
+        // for (order_item__c orderItem : orderItems) {
+        //     if (promotion.productId__c == orderItem.Product2Id__c) {
+        //         orderItem.AdjustmentsAmount__c = orderItem.total_price__c - discount;
+        //         totalDiscount += discount;
+        //         updatedItems.add(orderItem);
+        //     }
+        // }
+
+        List<order_item__c> matchingItems = adjustmentDTO.orderItemsByProductId.get(promotion.productId__c);
+        if (matchingItems != null) {
+         for (order_item__c orderItem : matchingItems) {
+            orderItem.AdjustmentsAmount__c = orderItem.total_price__c - discount;
+            totalDiscount += discount;
+            updatedItems.add(orderItem);
+         }
+    }
+        
 
         if (!updatedItems.isEmpty()) {
             try {
