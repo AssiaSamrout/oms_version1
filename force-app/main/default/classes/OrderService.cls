@@ -1,5 +1,14 @@
 public with sharing class OrderService {
-
+    /*
+        * This class handles order processing, including creating orders and calculating total amounts.
+        * It interacts with OrderRepository and OrderItemService to manage order records and items.
+        *
+        *@param orderResponse The response wrapper containing order details.
+        * @return An OrderProcessingResult indicating success or failure of the order creation.
+        * @throws IllegalArgumentException if the orderResponse is null or invalid.
+        * @throws DmlException if there is an error during the order creation process.
+        * @throws Exception for any unexpected errors during order processing.
+    */
     public OrderProcessingResult createOrder(OrderResponseWrapper orderResponse) {
         OrderProcessingResult result = new OrderProcessingResult();
         Savepoint sp = Database.setSavepoint();

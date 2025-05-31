@@ -48,7 +48,15 @@ public with sharing class PromotionService {
         ];
     }
 
-    public static PromotionEligibilityResult isEligible(order__c order, List<order_item__c> orderItems, promotion__c promotion){
+    /*
+        * Check if the order is eligible for the promotion based on the rules defined in the PromotionRulesEngine.
+        * 
+        * @param order The order to check for eligibility.
+        * @param orderItemsByProduct A map of product Ids to their corresponding order items.
+        * @param promotion The promotion to check against the order.
+        * @return A PromotionEligibilityResult indicating whether the order is eligible and any failure reasons.
+    */
+    public static PromotionEligibilityResult isEligible(order__c order, Map<Id,List<order_item__c>> orderItemsByProduct, promotion__c promotion){
         //check the rule of the promotion if it is applicable on this order using rule 
             // promotion__c promotion = [
             // SELECT Id, Name, Percentage__c,RecordTypeId, RecordType.Name,DiscountValue__c, isAutomatic__c, Type__c, activeFrom__c, activeTo__C
@@ -58,16 +66,24 @@ public with sharing class PromotionService {
 
             //we should make sure that promotion has recordType.name field value(this field does not get retrieved when the promotion is inserted)
         System.debug('inside is promotion applicable');
-        if(order == null || orderItems == null || promotion ==null){
+        if(order == null || orderItemsByProduct == null || promotion ==null){
             throw new IllegalArgumentException('Order, OrderItems and Promotion cannot be null');
         }
 
-        return PromotionRulesEngine.isEligible(order, orderItems, promotion);
+        return PromotionRulesEngine.isEligible(order, orderItemsByProduct, promotion);
     }
 
+    /*
+        * Calculate the discount amount for the order based on the promotion type.
+        * This method uses the DiscountTypeFactory to get the appropriate discount strategy.
+        * 
+        * @param order The order for which the discount is to be calculated.
+        * @param orderItemsByProduct A map of product Ids to their corresponding order items.
+        * @param promotion The promotion containing the discount rules.
+        * @return The calculated discount amount as a Decimal.
+    */
 
-
-    public static Decimal calculateDiscount(order__c order, List<order_item__c> orderItems, promotion__c promotion){
+    public static Decimal calculateDiscount(order__c order, Map<Id,List<order_item__c>> orderItemsByProduct, promotion__c promotion){
         //calculate the discount amount based on the promotion type 
         //calling promotion type factory to get the discount strategy
         System.debug('inside calculate discount');
@@ -75,7 +91,7 @@ public with sharing class PromotionService {
         if(discountCalculation == null) {
             throw new IllegalArgumentException('Discount calculation strategy not found');
         }
-        return discountCalculation.calculateDiscount(order, orderItems, promotion);
+        return discountCalculation.calculateDiscount(order, orderItemsByProduct, promotion);
     }
 
 }

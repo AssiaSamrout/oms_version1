@@ -1,5 +1,16 @@
 public with sharing class FixedDiscountStrategy implements IDiscountStrategy {
-    public Decimal calculateDiscount(order__c order, List<order_item__c> orderItems, promotion__c promotion) {
+    /*
+        * This method calculates the discount for a fixed amount promotion.
+        * It checks if the promotion's DiscountValue__c is set and valid.
+        * It is used for promotions that provide a fixed discount amount.
+        *
+        * @param order The order to calculate the discount for.
+        * @param orderItemsByProduct A map of product Ids to their corresponding order items (not used in this strategy).
+        * @param promotion The promotion to calculate the discount from.
+        * @return The fixed discount value as specified in the promotion.
+        * @throws IllegalArgumentException if the DiscountValue__c is null or negative, or if Percentage__c is set.
+    */
+    public Decimal calculateDiscount(order__c order, Map<Id,List<order_item__c>> orderItemsByProduct, promotion__c promotion) {
         if (promotion.DiscountValue__c == null) {
             throw new IllegalArgumentException('Discount value cannot be null');
         }

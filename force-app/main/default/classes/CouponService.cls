@@ -1,4 +1,8 @@
 public with sharing class CouponService {
+    /*
+     * This class provides methods to manage and validate coupons.
+     * It includes methods to retrieve coupons by code, validate them, increment usage count, and change their active status.
+     */
     public static coupon__c getCouponByCouponCode(String code) {
         if(String.isBlank(code)) {
             throw new IllegalArgumentException('Coupon code cannot be null or empty');

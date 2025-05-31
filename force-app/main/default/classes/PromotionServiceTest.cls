@@ -1,5 +1,9 @@
 @isTest
 public with sharing class PromotionServiceTest {
+    /*
+        * Test method to verify that the getAutoApplicablePromotions method
+        * returns the correct promotions that are automatically applicable.
+        */
     @isTest
     public static void testGetAutoApplicablePromotions(){
        
@@ -16,6 +20,11 @@ public with sharing class PromotionServiceTest {
         System.assertEquals(1, results.size(), 'There should be one applicable promotion');
     }
 
+    /*
+        * Test method to verify the eligibility of an order for a promotion.
+        * This test checks if the order meets the minimum amount requirement for the promotion.
+        * It prepares necessary data, inserts a promotion, and asserts that the order is eligible.
+    */
     @isTest
     public static void testIseligible(){
         
@@ -23,11 +32,17 @@ public with sharing class PromotionServiceTest {
         order__c order = TestsSetUp.createOrder();
         List<order_item__c> orderItems = TestsSetUp.createOrderItems(order, products);
         List<promotion__c> promotions = TestsSetUp.makeDataForPromotionRule();
-
+         Map<Id,List<order_item__c>> orderItemsByProductId = new Map<Id,List<order_item__c>>();
+    for(order_item__c item : orderItems){
+        if(!orderItemsByProductId.containsKey(item.Product2Id__c)){
+            orderItemsByProductId.put(item.Product2Id__c, new List<order_item__c>());
+        }
+        orderItemsByProductId.get(item.Product2Id__c).add(item);
+    }
        
         Test.startTest();
-        PromotionEligibilityResult result1 = PromotionService.isEligible(order, orderItems, promotions[0]);
-        PromotionEligibilityResult result2 = PromotionService.isEligible(order, orderItems, promotions[1]);
+        PromotionEligibilityResult result1 = PromotionService.isEligible(order, orderItemsByProductId, promotions[0]);
+        PromotionEligibilityResult result2 = PromotionService.isEligible(order, orderItemsByProductId, promotions[1]);
         Test.stopTest();
 
      
@@ -37,7 +52,11 @@ public with sharing class PromotionServiceTest {
         System.assertEquals(1, result2.failureReasons.size(), 'There should be one failure reason');
 
     }
-
+    /*
+        * Test method to verify that an order is not eligible for a promotion
+        * when the minimum amount requirement is not met.
+        * This test prepares necessary data, inserts a promotion, and asserts that the order is not eligible.
+    */
     @isTest
     public static void testCalculateDiscount(){
        
@@ -45,14 +64,26 @@ public with sharing class PromotionServiceTest {
         order__c order = TestsSetUp.createOrder();
         List<order_item__c> orderItems = TestsSetUp.createOrderItems(order, products);
         List<promotion__c> promotions = TestsSetUp.makeDataForPromotionRule();
+        Map<Id,List<order_item__c>> orderItemsByProductId = new Map<Id,List<order_item__c>>();
+        for(order_item__c item : orderItems){
+        if(!orderItemsByProductId.containsKey(item.Product2Id__c)){
+            orderItemsByProductId.put(item.Product2Id__c, new List<order_item__c>());
+        }
+        orderItemsByProductId.get(item.Product2Id__c).add(item);
+        }
 
         Test.startTest();
-        Decimal discount1 = PromotionService.calculateDiscount(order, orderItems, promotions[0]);
+        Decimal discount1 = PromotionService.calculateDiscount(order,orderItemsByProductId, promotions[0]);
         Test.stopTest();
 
         System.debug('Discount calculated: ' + discount1);
               System.assertNotEquals(null, discount1, 'Discount should not be null');
     }
+
+    /*
+        *Test method to verify that the getPromotionById method
+        * retrieves the correct promotion by its Id.
+    */
     
     @isTest
     public static void testgetPromotionById(){
@@ -66,6 +97,10 @@ public with sharing class PromotionServiceTest {
    
     }
 
+    /*
+        * Test method to verify that the getPromotionsByIds method
+        * retrieves the correct promotions by their Ids.
+    */
     
     @isTest
     public static void testgetpromotionsById(){
@@ -79,9 +114,14 @@ public with sharing class PromotionServiceTest {
         Test.stopTest();      
         System.assertNotEquals(null, promotionsres, 'it should contains promotion information');
     }
+
+    /*
+        * Test method to verify that the getPromotionById method
+        * returns null for a non-existing promotion Id.
+    */
     
     @isTest
-    static void testGetPromotionById_invalidId() {
+    static void testGetPromotionByIdinvalidId() {
         
         Id fakeId = 'a1A000000000XYZAAA'; 
 
@@ -91,9 +131,11 @@ public with sharing class PromotionServiceTest {
 
         System.assertEquals(null, result, 'Expected null for non-existing promotion Id');
     }
-
+    /*
+        * Test the result of entering invalid Ids in the getPromotionsByIds method.
+    */
     @isTest
-    static void testGetPromotionsByIds_validAndInvalidIds() {
+    static void testGetPromotionsByIdsvalidAndInvalidIds() {
  
         List<promotion__c> testPromotions = TestsSetUp.makeDataForPromotionRule();
         List<Id> promoIds = new List<Id>();
@@ -116,8 +158,12 @@ public with sharing class PromotionServiceTest {
         }
     }
 
+    /*
+        * Test method to verify that the getPromotionsByIds method
+        * returns an empty list when no Ids are provided.
+    */
     @isTest
-    static void testGetPromotionsByIds_emptyList() {
+    static void testGetPromotionsByIdsemptyList() {
         Test.startTest();
             List<promotion__c> results = PromotionService.getPromotionsByIds(new List<Id>());
         Test.stopTest();
@@ -126,6 +172,11 @@ public with sharing class PromotionServiceTest {
         System.assertEquals(0, results.size(), 'Expected empty list for empty input');
     }
 
+
+    /*
+        * Test method to verify that the getPromotionsByIds method
+        * returns an empty list when a null list is provided.
+    */
     @isTest
     static void testGetPromotionsByIds_nullList() {
     List<Id> nullList = null;

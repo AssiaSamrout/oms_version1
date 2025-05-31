@@ -1,4 +1,8 @@
 public with sharing class OrderRepository {
+    /*
+     * This class is responsible for handling order-related operations such as creating and retrieving orders.
+     * It interacts with the custom order__c object in Salesforce.
+     */
     public static order__c createOrderRecord(OrderResponseWrapper orderResponse) {
         order__c newOrder = new order__c();
         newOrder.AccountId__c = orderResponse.accountId;

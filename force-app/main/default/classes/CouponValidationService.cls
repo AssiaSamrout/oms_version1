@@ -1,5 +1,8 @@
 public with sharing class CouponValidationService {
-
+    /*
+     * This class provides methods to validate coupon codes.
+     * It checks if the coupon exists, if it is valid, and retrieves the associated promotion.
+     */
     public static CouponValidationResult validateCouponCode(String couponCode){
         try{
         CouponValidationResult result = new CouponValidationResult();

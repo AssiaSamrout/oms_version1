@@ -1,3 +1,11 @@
+/*
+    * OrderResponseWrapper.cls
+    * 
+    * This class is used to encapsulate the response structure for order details.
+    * It includes information about the order, customer, billing info, items, adjustments, and payment.
+    *
+*/
+
 public with sharing class OrderResponseWrapper {
     
     public String orderName;

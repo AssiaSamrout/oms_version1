@@ -1,5 +1,7 @@
 public with sharing class OrderItemRepository {
-    
+    /*     * This class provides methods to interact with the order_item__c object.
+     * It includes methods for inserting order items and retrieving order items by order ID.
+     */
     public static Database.SaveResult[] insertItems(List<order_item__c> items, Boolean allOrNone) {
         return Database.insert(items, allOrNone);
     }

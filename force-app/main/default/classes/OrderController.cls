@@ -1,5 +1,11 @@
 @RestResource(urlMapping='/order/*')
 global with sharing class OrderController {
+    /*
+     * This class handles the creation of orders via a REST API endpoint.
+     * It processes incoming JSON requests, validates the data, and interacts with the OrderService
+     * to create orders in Salesforce.
+     * It returns appropriate HTTP responses based on the success or failure of the order creation.
+     */
     @HttpPost
     global static void createOrder() {
         RestRequest req = RestContext.request;

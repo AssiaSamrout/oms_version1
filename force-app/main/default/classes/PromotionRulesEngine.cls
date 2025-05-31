@@ -1,13 +1,17 @@
 public with sharing class PromotionRulesEngine {
-    
-    public static PromotionEligibilityResult isEligible(order__c order, List<order_item__c> orderItems, promotion__c promotion) {
+    /*
+        * This class evaluates the eligibility of an order for a given promotion based on defined rules.
+        * It retrieves the rules from custom metadata and applies them to the order and its items.
+        * the retrieved rules are fetched based on the promotion's record type.(order level or item level)
+    */
+    public static PromotionEligibilityResult isEligible(order__c order,Map<Id,List<order_item__c>> orderItemsByProduct, promotion__c promotion) {
        
         PromotionEligibilityResult result = new PromotionEligibilityResult(true);
         System.debug('inside promotionengine first log');
         System.debug(promotion.RecordType.Name);
         System.debug(promotion.RecordTypeId);
 
-        if(order == null || orderItems == null || promotion == null){
+        if(order == null || orderItemsByProduct == null || promotion == null){
             throw new IllegalArgumentException('Order, OrderItems and Promotion cannot be null');
         }
 
@@ -29,7 +33,7 @@ public with sharing class PromotionRulesEngine {
 
             IPromotionRule ruleInstance = (IPromotionRule) ruleType.newInstance();
             System.debug('rule class instance:'+ruleInstance);
-            if(!ruleInstance.isEligible(order, orderItems, promotion)){
+            if(!ruleInstance.isEligible(order, orderItemsByProduct, promotion)){
                 result.isEligible = false;
                 result.failureReasons.add(promorule.RuleName__c + ' is not applicable on this order');
 
@@ -44,6 +48,14 @@ public with sharing class PromotionRulesEngine {
 
         return result;
     }
+
+    /*
+        * Retrieves all active promotion eligibility rules for the given promotion.
+        * The rules are filtered based on the promotion's record type and whether they are active.
+        * 
+        * @param promotion The promotion object for which to retrieve the rules.
+        * @return A list of active PromotionEligibilityRules__mdt records applicable to the promotion.
+    */
 
     public static List<PromotionEligibilityRules__mdt> getAllRules(promotion__c promotion){
         if(!Schema.SObjectType.PromotionEligibilityRules__mdt.isAccessible()) {

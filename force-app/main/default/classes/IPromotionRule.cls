@@ -1,5 +1,12 @@
 public Interface IPromotionRule {
-    
-    Boolean isEligible(order__c order, List<order_item__c> orderItems, promotion__c promotion);
-   // Boolean isEligible(PromotionEvaluationContext context);
+    /*     * This method checks if the order is eligible for a promotion based on the defined rules.
+           * It verifies if the order meets the criteria specified in the promotion.
+           * 
+           * @return true if the order is eligible for the promotion, false otherwise.
+           * @param order The order to check for eligibility.
+           * @param orderItemsByProduct A map of product Ids to their corresponding order items.
+           * @param promotion The promotion to check against the order.
+     */
+   // Boolean isEligible(order__c order, List<order_item__c> orderItems, promotion__c promotion);
+    Boolean isEligible(order__c order, Map<Id,List<order_item__c>> orderItemsByProduct, promotion__c promotion);
 }

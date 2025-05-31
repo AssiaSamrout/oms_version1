@@ -1,4 +1,16 @@
 public with sharing class PostCheckoutProcessor {
+    /*
+        * This method processes the post-checkout actions for an order.
+        * It applies promotions, updates order adjustments, and calculates the total order amount.
+        *it uses a helper method to process promotions based on their level (order or item).
+        * It checks if the order object is updateable and retrieves applicable promotions and coupons.
+
+        * @param order The order to process.
+        * @param orderItems The list of order items associated with the order.
+        * @param couponCodes The list of coupon codes to apply to the order.
+        * @throws SecurityException if the Order object is not updateable.
+        * @throws IllegalArgumentException if no valid coupons or applicable promotions are found.
+    */
     public static void processPostCheckout(order__c order, List<order_item__c> orderItems, List<String> couponCodes){
 
         //check if order object is updateable
@@ -79,6 +91,14 @@ public with sharing class PostCheckoutProcessor {
 
     }
 
+    /*
+        * This method processes promotions based on the provided ProcessPromotionsDTO.
+        * It evaluates the eligibility of each promotion, applies adjustments, and updates coupons.
+        * It uses a factory to get the appropriate handler for the promotion level.
+        *
+        * @param processPromotionsDTO The DTO containing order, order items, promotions, and coupon mapping.
+        * @throws SecurityException if the coupon or order adjustment objects are not accessible or updatable.
+    */
     public static void processPromotions(ProcessPromotionsDTO processPromotionsDTO){
 
         //check accessibility and updatibility of coupons and adjustments

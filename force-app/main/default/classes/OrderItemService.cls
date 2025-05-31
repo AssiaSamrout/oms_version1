@@ -1,3 +1,10 @@
+/*
+    * OrderResponseWrapper.cls
+    * 
+    * This class is used to encapsulate the response structure for order details.
+    * It includes information about the order, customer, billing info, items, adjustments, and payment.
+    * It is designed to be used in conjunction with the OrderService and OrderRepository classes
+*/
 public with sharing class OrderItemService {
 
     public class InsertResult {
