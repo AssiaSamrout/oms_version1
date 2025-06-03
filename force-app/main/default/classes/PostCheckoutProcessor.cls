@@ -1,147 +1,146 @@
+
 public with sharing class PostCheckoutProcessor {
-    /*
-        * This method processes the post-checkout actions for an order.
-        * It applies promotions, updates order adjustments, and calculates the total order amount.
-        *it uses a helper method to process promotions based on their level (order or item).
-        * It checks if the order object is updateable and retrieves applicable promotions and coupons.
 
-        * @param order The order to process.
-        * @param orderItems The list of order items associated with the order.
-        * @param couponCodes The list of coupon codes to apply to the order.
-        * @throws SecurityException if the Order object is not updateable.
-        * @throws IllegalArgumentException if no valid coupons or applicable promotions are found.
-    */
-    public static void processPostCheckout(order__c order, List<order_item__c> orderItems, List<String> couponCodes){
-
-        //check if order object is updateable
-        if(!order__c.SObjectType.getDescribe().isUpdateable()){
+    public static void processPostCheckout(order__c order, List<order_item__c> orderItems, List<String> couponCodes) {
+        System.debug('Processing post checkout for order: ' + order.Id);
+        if (!order__c.SObjectType.getDescribe().isUpdateable()) {
             throw new SecurityException('Order object is not updateable');
         }
 
-        //get all coupons by coupon codes
         List<coupon__c> coupons = CouponService.getCouponsByCouponCodes(couponCodes);
-        if(coupons.isEmpty()){
+        if (coupons.isEmpty()) {
             throw new IllegalArgumentException('No valid coupons found');
         }
-        
-        //get auto applicable promotions
-        List<promotion__c> autoPromotions = PromotionService.getAutoApplicablePromotions();
-        //check if auto promotions are empty
-        if(autoPromotions.isEmpty()){
-            System.debug('No auto promotions found');
-        }
-        //add auto applicable promotionIds to a list
+
+        // Get promotion IDs from coupons
         List<Id> promotionIds = new List<Id>();
-        for(coupon__c coupon : coupons){
-            if(coupon.PromotionId__c != null){
+        for (coupon__c coupon : coupons) {
+            if (coupon.PromotionId__c != null) {
                 promotionIds.add(coupon.PromotionId__c);
             }
         }
-        //get applicable promotions by promotionIds
-        List<promotion__c> applicablePromotions = new List<promotion__c>();
-        applicablePromotions = PromotionService.getPromotionsByIds(promotionIds);
-        if(applicablePromotions.isEmpty()){
-            System.debug('No applicable promotions found inside processPostCheckout');
+        System.debug('Promotion IDs from coupons: ' + promotionIds);
+
+        // Get applicable and auto promotions together
+        List<promotion__c> promotions = PromotionService.getPromotionsByIdWithAutoPromo(promotionIds);
+        if (promotions.isEmpty()) {
             throw new IllegalArgumentException('No applicable promotions found');
         }
 
-        //map promotionId to coupon
-        Map<Id, coupon__c> promoToCoupon = new Map<Id, coupon__c>();
-        for (coupon__c c : coupons) {
-            if (c.PromotionId__c != null) {
-                promoToCoupon.put(c.PromotionId__c, c);
-            }
-        }
-        //spit promotions into order level and item level
-        List<promotion__c> orderLevelPromos = new List<promotion__c>();
-        List<promotion__c> itemLevelPromos = new List<promotion__c>();
+        System.debug('Found promotions: ' + promotions);
 
-        for (promotion__c promo : autoPromotions) {
-            if (promo.RecordType.Name == 'order_level') {orderLevelPromos.add(promo);}
-            else if (promo.RecordType.Name == 'item_level') {itemLevelPromos.add(promo);}
-        }
-        for(promotion__c promo : applicablePromotions){
-            if (promo.RecordType.Name == 'order_level') {orderLevelPromos.add(promo);}
-            else if (promo.RecordType.Name == 'item_level') {itemLevelPromos.add(promo);}
-        }
-        //call processPromotions for order level promotions
-        ProcessPromotionsDTO orderLevelDTO = new ProcessPromotionsDTO();
-        orderLevelDTO.order = order;
-        orderLevelDTO.orderItems = orderItems;
-        orderLevelDTO.promotions = orderLevelPromos;
-        orderLevelDTO.promoToCoupon = promoToCoupon;
-        orderLevelDTO.promotionType = 'order_level';
-        processPromotions(orderLevelDTO);
-        //call processPromotions for item level promotions
+        Map<Id, coupon__c> promoToCoupon = buildPromoToCouponMap(coupons);
+
+        // Split promotions by level
+        Map<String, List<promotion__c>> promoMap = splitPromotionsByLevel(promotions);
+
+        // Process each type of promotion
+        ProcessPromotionsDTO processDTO = new ProcessPromotionsDTO();
+        processDTO.order = order;
+        processDTO.orderItems = orderItems;
+        processDTO.promoToCoupon = promoToCoupon;
+        processDTO.promotions = promoMap.get('order_level');
+        processDTO.promotionType = 'order_level';
+        processPromotions(processDTO);
         ProcessPromotionsDTO itemLevelDTO = new ProcessPromotionsDTO();
         itemLevelDTO.order = order;
         itemLevelDTO.orderItems = orderItems;
-        itemLevelDTO.promotions = itemLevelPromos;
         itemLevelDTO.promoToCoupon = promoToCoupon;
+        itemLevelDTO.promotions = promoMap.get('item_level');
         itemLevelDTO.promotionType = 'item_level';
         processPromotions(itemLevelDTO);
-        //calculate total order adjustments
-        order.NetTotal__c = OrderService.adjustTotalAmount(order.SubTotal__c, (order.Total_order_adjustments__c != null ? order.Total_order_adjustments__c : 0));
+
+        // Recalculate and update order
+        order.NetTotal__c = OrderService.adjustTotalAmount(
+            order.SubTotal__c,
+            (order.Total_order_adjustments__c != null ? order.Total_order_adjustments__c : 0)
+        );
+
         try {
             update order;
         } catch (DmlException e) {
-            System.debug('Error updating order: ' + e.getMessage());
             throw new DmlException('Error updating order: ' + e.getMessage());
         }
-
     }
 
-    /*
-        * This method processes promotions based on the provided ProcessPromotionsDTO.
-        * It evaluates the eligibility of each promotion, applies adjustments, and updates coupons.
-        * It uses a factory to get the appropriate handler for the promotion level.
-        *
-        * @param processPromotionsDTO The DTO containing order, order items, promotions, and coupon mapping.
-        * @throws SecurityException if the coupon or order adjustment objects are not accessible or updatable.
-    */
-    public static void processPromotions(ProcessPromotionsDTO processPromotionsDTO){
+    private static Map<Id, coupon__c> buildPromoToCouponMap(List<coupon__c> coupons) {
+        System.debug('Building promo to coupon map');
+        Map<Id, coupon__c> ptcmap = new Map<Id, coupon__c>();
+        for (coupon__c c : coupons) {
+            if (c.PromotionId__c != null) {
+                ptcmap.put(c.PromotionId__c, c);
+            }
+        }
+        return ptcmap;
+    }
 
-        //check accessibility and updatibility of coupons and adjustments
-        if(!coupon__c.SObjectType.getDescribe().isUpdateable() || !order_adjustment__c.SObjectType.getDescribe().isUpdateable()){
+    private static Map<String, List<promotion__c>> splitPromotionsByLevel(List<promotion__c> promotions) {
+        Map<String, List<promotion__c>> result = new Map<String, List<promotion__c>>{
+            'order_level' => new List<promotion__c>(),
+            'item_level' => new List<promotion__c>()
+        };
+
+        for (promotion__c promo : promotions) {
+            if (promo.RecordType.Name == 'order_level') {
+                result.get('order_level').add(promo);
+            } else if (promo.RecordType.Name == 'item_level') {
+                result.get('item_level').add(promo);
+            }
+        }
+
+        return result;
+    }
+
+    public static void processPromotions(ProcessPromotionsDTO dto) {
+        if (!coupon__c.SObjectType.getDescribe().isUpdateable() || !order_adjustment__c.SObjectType.getDescribe().isUpdateable()) {
             throw new SecurityException('Coupon or Order Adjustment objects are not accessible or updatable');
         }
 
-        order__c order = processPromotionsDTO.order;
-        List<order_item__c> orderItems = processPromotionsDTO.orderItems;
-        List<promotion__c> promotions = processPromotionsDTO.promotions;
-        Map<Id, coupon__c> promoToCoupon = processPromotionsDTO.promoToCoupon;
-        List<order_adjustment__c> allAdjustments = new List<order_adjustment__c>();
-        List<coupon__c> couponsToUpdate = new List<coupon__c>();
-        if(promotions.isEmpty()){
-            System.debug('No promotions found');
+        if (dto.promotions.isEmpty()) {
+            System.debug('No promotions found for type: ' + dto.promotionType);
             return;
         }
-        String promotionType = processPromotionsDTO.promotionType;
-        IPromotionLevelHandler handler = PromotionLevelHandlerFactory.getPromotionLevelHandler(promotionType);
-        AdjustmentDTO adjustmentDTO;
-        for(promotion__c promo : promotions){
-           adjustmentDTO = new AdjustmentDTO(order, orderItems, promo, promoToCoupon.get(promo.Id));
-           PromotionEligibilityResult result = handler.evaluateEligibility(adjustmentDTO);
-            if (!result.isEligible) {continue;}
+        System.debug('Processing promotions for type: ' + dto.promotionType);
+        System.debug('Promotions: ' + dto.promotions);
+        System.debug('Order: ' + dto.order);
+        System.debug('Order Items: ' + dto.orderItems);
+        System.debug('Promo to Coupon Map: ' + dto.promoToCoupon);
+        IPromotionLevelHandler handler = PromotionLevelHandlerFactory.getPromotionLevelHandler(dto.promotionType);
+        List<order_adjustment__c> allAdjustments = new List<order_adjustment__c>();
+        List<coupon__c> couponsToUpdate = new List<coupon__c>();
+        System.debug('inside processPromotions before the loop');
+        for (promotion__c promo : dto.promotions) {
+            AdjustmentDTO adjustmentDTO = new AdjustmentDTO(dto.order, dto.orderItems, promo, dto.promoToCoupon.get(promo.Id));
+            PromotionEligibilityResult result = handler.evaluateEligibility(adjustmentDTO);
+
+            if (!result.isEligible) {
+                continue;
+            }
             List<order_adjustment__c> adjustments = handler.getAdjustments(adjustmentDTO);
-            if (!adjustments.isEmpty()) { allAdjustments.addAll(adjustments); }
-            
+            if (!adjustments.isEmpty()) {
+            allAdjustments.addAll(adjustments);
+            }
             handler.applySideEffects(adjustmentDTO);
 
-            if(adjustmentDTO.coupon != null){
+            if (adjustmentDTO.coupon != null) {
                 adjustmentDTO.coupon.UsageCount__c = (adjustmentDTO.coupon.UsageCount__c != null ? adjustmentDTO.coupon.UsageCount__c : 0) + 1;
                 couponsToUpdate.add(adjustmentDTO.coupon);
             }
         }
-        if(!couponsToUpdate.isEmpty()){
-            try{
-                update couponsToUpdate;
-                update allAdjustments;
-            }catch(DmlException e){
-                System.debug('Error updating coupons: ' + e.getMessage());
+
+        if (!couponsToUpdate.isEmpty() || !allAdjustments.isEmpty()) {
+            try {
+                if (!couponsToUpdate.isEmpty()) {
+                    System.debug('Updating coupons: ' + couponsToUpdate);
+                    update couponsToUpdate;
+                }
+                if (!allAdjustments.isEmpty()){ 
+                    insert allAdjustments;
+                }
+            } catch (DmlException e) {
+                System.debug('Error updating coupons/adjustments: ' + e.getMessage());
+                throw new DmlException('Insertion failed in post checkout: ' + e.getMessage());
             }
         }
-
     }
-
 }

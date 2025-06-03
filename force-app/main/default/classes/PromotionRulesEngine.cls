@@ -24,14 +24,12 @@ public with sharing class PromotionRulesEngine {
 		System.debug('fetched rules inside promotionRulesEngine'+rules[0]);
         for(PromotionEligibilityRules__mdt promorule : rules){
             System.debug('inside the loop');
-            Type ruleType = Type.forName(promorule.ClassName__c);
-            if(ruleType == null) {
+            IPromotionRule ruleInstance = PromotionRuleCacheHelper.getRuleInstance(promorule.ClassName__c);
+            if(ruleInstance == null) {
                 result.isEligible = false;
                 result.failureReasons.add('Class not found: ' + promorule.ClassName__c);
                 continue; // Skip this rule, continue checking others
             }
-
-            IPromotionRule ruleInstance = (IPromotionRule) ruleType.newInstance();
             System.debug('rule class instance:'+ruleInstance);
             if(!ruleInstance.isEligible(order, orderItemsByProduct, promotion)){
                 result.isEligible = false;

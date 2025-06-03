@@ -25,6 +25,7 @@ public with sharing class OrderLevelPromotionHandler implements IPromotionLevelH
         adjustment.couponName__c = (adjustmentDTO.coupon!= null ? adjustmentDTO.coupon.Id : null);
         adjustment.Amount__c = discount;
         adjustment.RecordTypeId = orderLevelRT;
+        adjustment.Description__c = 'Order Level Promotion: ' + adjustmentDTO.promotion.Name;
 
         return new List<order_adjustment__c> { adjustment };
     }

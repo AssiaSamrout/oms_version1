@@ -29,7 +29,7 @@ public with sharing class PromotionService {
 
         return [
             SELECT Id, Name, Percentage__c, RecordTypeId, RecordType.Name, DiscountValue__c, 
-                   isAutomatic__c, Type__c, activeFrom__c, activeTo__c,Description__c
+                   isAutomatic__c, Type__c, activeFrom__c, activeTo__c,Description__c,MinAmount__c
             FROM promotion__c
             WHERE Id IN :promotionIds
         ];
@@ -39,12 +39,29 @@ public with sharing class PromotionService {
         if(!promotion__c.SObjectType.getDescribe().isAccessible()) {
             throw new SecurityException('Promotion object not accessible');
         }
-        return [SELECT Id, Name, Percentage__c, RecordType.Name,DiscountValue__c, isAutomatic__c, Type__c, activeFrom__c, activeTo__C,Description__c
+        return [SELECT Id, Name, Percentage__c, RecordType.Name,MinAmount__c,DiscountValue__c, isAutomatic__c, Type__c, activeFrom__c, activeTo__C,Description__c
                 FROM promotion__c
                 WHERE isAutomatic__c = true
                 AND activeFrom__c <= :Date.today()
                 AND (activeTo__c >= :Date.today() OR activeTo__c = null)
+        ];
+    }
 
+    public static List<Promotion__c> getPromotionsByIdWithAutoPromo(List<Id> promotionIds){
+        if(!promotion__c.SObjectType.getDescribe().isAccessible()) {
+            throw new SecurityException('Promotion object not accessible');
+        }
+        
+        if (promotionIds == null || promotionIds.isEmpty()) {
+            return new List<promotion__c>(); 
+        }
+
+        return [
+            SELECT Id, Name, Percentage__c, RecordTypeId, RecordType.Name, DiscountValue__c, 
+                   isAutomatic__c, Type__c, activeFrom__c, activeTo__c,Description__c,MinAmount__c
+            FROM promotion__c
+            WHERE Id IN :promotionIds OR 
+            (isAutomatic__c = true AND activeFrom__c <= :Date.today() AND (activeTo__c >= :Date.today() OR activeTo__c = null))
         ];
     }
 

@@ -4,5 +4,7 @@ public with sharing class ProcessPromotionsDTO {
     public List<promotion__c> promotions {get;set;}
     public Map<Id,coupon__c> promoToCoupon {get;set;}
     public String promotionType {get;set;}
+
+    
     
 }
