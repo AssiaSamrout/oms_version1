@@ -8,12 +8,12 @@
 public with sharing class OrderItemService {
 
     public class InsertResult {
-        public List<order_item__c> successfulItems = new List<order_item__c>();
+        public List<Order_item__c> successfulItems = new List<Order_item__c>();
         public List<String> errors = new List<String>();
     }
 
     public static InsertResult insertOrderItems(List<ItemDTO> items, Id orderId) {
-        if (!order_item__c.SObjectType.getDescribe().isCreateable()) {
+        if (!Order_item__c.SObjectType.getDescribe().isCreateable()) {
             throw new SecurityException('OrderItem object not creatable');
         }
 
@@ -27,7 +27,7 @@ public with sharing class OrderItemService {
         Map<String, Product2> skuToProductMap = Product2Repository.findProductBySKU(skus);
         validateSkus(skus, skuToProductMap.keySet());
 
-        List<order_item__c> orderItems = buildOrderItems(items, skuToProductMap, orderId);
+        List<Order_item__c> orderItems = buildOrderItems(items, skuToProductMap, orderId);
 
         InsertResult result = new InsertResult();
         Database.SaveResult[] saveResults = OrderItemRepository.insertItems(orderItems, false);
@@ -62,15 +62,15 @@ public with sharing class OrderItemService {
         }
     }
 
-    private static List<order_item__c> buildOrderItems(List<ItemDTO> items, Map<String, Product2> skuMap, Id orderId) {
-        List<order_item__c> orderItems = new List<order_item__c>();
+    private static List<Order_item__c> buildOrderItems(List<ItemDTO> items, Map<String, Product2> skuMap, Id orderId) {
+        List<Order_item__c> orderItems = new List<Order_item__c>();
         for (ItemDTO item : items) {
             Product2 product = skuMap.get(item.sku);
             if (product == null){ 
             continue;
             }
 
-            order_item__c oi = new order_item__c(
+            Order_item__c oi = new Order_item__c(
                 orderId__c = orderId,
                 Product2Id__c = product.Id,
                 Name = item.productName,
@@ -84,13 +84,13 @@ public with sharing class OrderItemService {
         return orderItems;
     }
 
-    public static List<order_item__c> getOrderItemsByOrderId(Id orderId) {
+    public static List<Order_item__c> getOrderItemsByOrderId(Id orderId) {
         if (orderId == null) {
             System.debug('inside OrderItemService: Order ID cannot be null');
             throw new IllegalArgumentException('Order ID cannot be null');
         }
 
-        List<order_item__c> orderItems = OrderItemRepository.getOrderItemsByOrderId(orderId);
+        List<Order_item__c> orderItems = OrderItemRepository.getOrderItemsByOrderId(orderId);
         if (orderItems == null || orderItems.isEmpty()) {
             System.debug('inside OrderItemService: Order items not found for Order ID: ' + orderId);
             throw new IllegalArgumentException('Order items not found for Order ID: ' + orderId);

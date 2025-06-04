@@ -3,27 +3,27 @@ public with sharing class RuleEngineTest {
    /*
     * Test method to verify the eligibility of an order for a promotion.
     * This test checks if the order meets the minimum amount requirement for the promotion.
-    * It prepares necessary data, inserts a promotion, and asserts that the order is eligible.
+    * It prepares necessary data, inserts a promotion, and asserts that the order is eligible. 
    */
    @isTest
    public static void testIsEligible(){
 
     //prepare data
     List<Product2> products = TestsSetUp.createProducts();
-    order__c order = TestsSetUp.createOrder();
-    List<order_item__c> orderItems = TestsSetUp.createOrderItems(order, products);
-    List<promotion__c> promotions = TestsSetUp.makeDataForPromotionRule();
-    Map<Id,List<order_item__c>> orderItemsByProductId = new Map<Id,List<order_item__c>>();
-    for(order_item__c item : orderItems){
+    Order__c order = TestsSetUp.createOrder();
+    List<Order_item__c> orderItems = TestsSetUp.createOrderItems(order, products);
+    List<Promotion__c> promotions = TestsSetUp.makeDataForPromotionRule();
+    Map<Id,List<Order_item__c>> orderItemsByProductId = new Map<Id,List<Order_item__c>>();
+    for(Order_item__c item : orderItems){
         if(!orderItemsByProductId.containsKey(item.Product2Id__c)){
-            orderItemsByProductId.put(item.Product2Id__c, new List<order_item__c>());
+            orderItemsByProductId.put(item.Product2Id__c, new List<Order_item__c>());
         }
         orderItemsByProductId.get(item.Product2Id__c).add(item);
     }
 
         //insert promotion
         RecordType rt = [SELECT Id FROM RecordType WHERE SObjectType='promotion__c' AND Name = 'order_level' LIMIT 1];
-        promotion__c promotion = new promotion__c (
+        Promotion__c promotion = new Promotion__c (
             Name='Order level promo with min amount',
             RecordTypeId = rt.Id,
             MinAmount__c = 100.0,
@@ -52,17 +52,17 @@ public with sharing class RuleEngineTest {
     public static void testIsEligibleNotApplicable(){
         //prepare data
     List<Product2> products = TestsSetUp.createProducts();
-    order__c order = TestsSetUp.createOrder();
-    List<order_item__c> orderItems = TestsSetUp.createOrderItems(order, products);
-     Map<Id,List<order_item__c>> orderItemsByProductId = new Map<Id,List<order_item__c>>();
-    for(order_item__c item : orderItems){
+    Order__c order = TestsSetUp.createOrder();
+    List<Order_item__c> orderItems = TestsSetUp.createOrderItems(order, products);
+     Map<Id,List<Order_item__c>> orderItemsByProductId = new Map<Id,List<Order_item__c>>();
+    for(Order_item__c item : orderItems){
         if(!orderItemsByProductId.containsKey(item.Product2Id__c)){
-            orderItemsByProductId.put(item.Product2Id__c, new List<order_item__c>());
+            orderItemsByProductId.put(item.Product2Id__c, new List<Order_item__c>());
         }
         orderItemsByProductId.get(item.Product2Id__c).add(item);
     }
-        RecordType rt = [SELECT Id FROM RecordType WHERE SObjectType='promotion__c' AND Name = 'order_level' LIMIT 1];
-        promotion__c promotion1 = new promotion__c (
+        RecordType rt = [SELECT Id FROM RecordType WHERE SObjectType='Promotion__c' AND Name = 'order_level' LIMIT 1];
+        Promotion__c promotion1 = new Promotion__c (
             Name='Order level promo with min amount',
             RecordTypeId = rt.Id,
             MinAmount__c = 500.0,
@@ -74,8 +74,8 @@ public with sharing class RuleEngineTest {
             Description__c = 'Test promotion for order level eligibility'
         );
         insert promotion1;
-        promotion__c promotion = [SELECT Id, Name, RecordTypeId, RecordType.Name, MinAmount__c, isAutomatic__c
-        FROM promotion__c
+        Promotion__c promotion = [SELECT Id, Name, RecordTypeId, RecordType.Name, MinAmount__c, isAutomatic__c
+        FROM Promotion__c
         WHERE Id = :promotion1.Id];
         Test.startTest();
         PromotionEligibilityResult result = PromotionRulesEngine.isEligible(order, orderItemsByProductId, promotion);

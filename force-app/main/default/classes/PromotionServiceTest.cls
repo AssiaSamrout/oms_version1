@@ -2,17 +2,17 @@
 public with sharing class PromotionServiceTest {
     /*
         * Test method to verify that the getAutoApplicablePromotions method
-        * returns the correct promotions that are automatically applicable.
+        * returns the correct promotions that are automatically applicable. 
         */
     @isTest
     public static void testGetAutoApplicablePromotions(){
        
-        List<promotion__c> promotions = TestsSetUp.makeDataForPromotionRule();
+        List<Promotion__c> promotions = TestsSetUp.makeDataForPromotionRule();
 
        
         Test.startTest();
         
-        List<promotion__c> results = PromotionService.getAutoApplicablePromotions();
+        List<Promotion__c> results = PromotionService.getAutoApplicablePromotions();
         Test.stopTest();
         System.debug('Results from getAutoApplicablePromotions: ' + results);
        
@@ -29,13 +29,13 @@ public with sharing class PromotionServiceTest {
     public static void testIseligible(){
         
         List<Product2> products = TestsSetUp.createProducts();
-        order__c order = TestsSetUp.createOrder();
-        List<order_item__c> orderItems = TestsSetUp.createOrderItems(order, products);
-        List<promotion__c> promotions = TestsSetUp.makeDataForPromotionRule();
-         Map<Id,List<order_item__c>> orderItemsByProductId = new Map<Id,List<order_item__c>>();
-    for(order_item__c item : orderItems){
+        Order__c order = TestsSetUp.createOrder();
+        List<Order_item__c> orderItems = TestsSetUp.createOrderItems(order, products);
+        List<Promotion__c> promotions = TestsSetUp.makeDataForPromotionRule();
+         Map<Id,List<Order_item__c>> orderItemsByProductId = new Map<Id,List<Order_item__c>>();
+    for(Order_item__c item : orderItems){
         if(!orderItemsByProductId.containsKey(item.Product2Id__c)){
-            orderItemsByProductId.put(item.Product2Id__c, new List<order_item__c>());
+            orderItemsByProductId.put(item.Product2Id__c, new List<Order_item__c>());
         }
         orderItemsByProductId.get(item.Product2Id__c).add(item);
     }
@@ -61,13 +61,13 @@ public with sharing class PromotionServiceTest {
     public static void testCalculateDiscount(){
        
         List<Product2> products = TestsSetUp.createProducts();
-        order__c order = TestsSetUp.createOrder();
-        List<order_item__c> orderItems = TestsSetUp.createOrderItems(order, products);
-        List<promotion__c> promotions = TestsSetUp.makeDataForPromotionRule();
-        Map<Id,List<order_item__c>> orderItemsByProductId = new Map<Id,List<order_item__c>>();
-        for(order_item__c item : orderItems){
+        Order__c order = TestsSetUp.createOrder();
+        List<Order_item__c> orderItems = TestsSetUp.createOrderItems(order, products);
+        List<Promotion__c> promotions = TestsSetUp.makeDataForPromotionRule();
+        Map<Id,List<Order_item__c>> orderItemsByProductId = new Map<Id,List<Order_item__c>>();
+        for(Order_item__c item : orderItems){
         if(!orderItemsByProductId.containsKey(item.Product2Id__c)){
-            orderItemsByProductId.put(item.Product2Id__c, new List<order_item__c>());
+            orderItemsByProductId.put(item.Product2Id__c, new List<Order_item__c>());
         }
         orderItemsByProductId.get(item.Product2Id__c).add(item);
         }
@@ -87,9 +87,9 @@ public with sharing class PromotionServiceTest {
     
     @isTest
     public static void testgetPromotionById(){
-        List<promotion__c> promotions = TestsSetUp.makeDataForPromotionRule();
+        List<Promotion__c> promotions = TestsSetUp.makeDataForPromotionRule();
         Test.startTest();
-        	promotion__c promotion=PromotionService.getPromotionById(promotions[0].Id);
+        	Promotion__c promotion=PromotionService.getPromotionById(promotions[0].Id);
         Test.stopTest();
         
         System.debug('gotten promotion in test get promotion by id: '+promotion);
@@ -104,13 +104,13 @@ public with sharing class PromotionServiceTest {
     
     @isTest
     public static void testgetpromotionsById(){
-        List<promotion__c> promotions = TestsSetUp.makeDataForPromotionRule();
+        List<Promotion__c> promotions = TestsSetUp.makeDataForPromotionRule();
         List<Id> proIDs = new List<Id>();
-        for(promotion__c pro :promotions){
+        for(Promotion__c pro :promotions){
             proIDs.add(pro.Id);
         }
 	    Test.startTest();
-        	List<promotion__c> promotionsres=PromotionService.getPromotionsByIds(proIDs);
+        	List<Promotion__c> promotionsres=PromotionService.getPromotionsByIds(proIDs);
         Test.stopTest();      
         System.assertNotEquals(null, promotionsres, 'it should contains promotion information');
     }
@@ -126,7 +126,7 @@ public with sharing class PromotionServiceTest {
         Id fakeId = 'a1A000000000XYZAAA'; 
 
         Test.startTest();
-            promotion__c result = PromotionService.getPromotionById(fakeId);
+            Promotion__c result = PromotionService.getPromotionById(fakeId);
         Test.stopTest();
 
         System.assertEquals(null, result, 'Expected null for non-existing promotion Id');
@@ -137,10 +137,10 @@ public with sharing class PromotionServiceTest {
     @isTest
     static void testGetPromotionsByIdsvalidAndInvalidIds() {
  
-        List<promotion__c> testPromotions = TestsSetUp.makeDataForPromotionRule();
+        List<Promotion__c> testPromotions = TestsSetUp.makeDataForPromotionRule();
         List<Id> promoIds = new List<Id>();
 
-        for (promotion__c promo : testPromotions) {
+        for (Promotion__c promo : testPromotions) {
             promoIds.add(promo.Id);
         }
 
@@ -148,12 +148,12 @@ public with sharing class PromotionServiceTest {
         promoIds.add(fakeId);
 
         Test.startTest();
-            List<promotion__c> results = PromotionService.getPromotionsByIds(promoIds);
+            List<Promotion__c> results = PromotionService.getPromotionsByIds(promoIds);
         Test.stopTest();
 
  
         System.assertEquals(testPromotions.size(), results.size(), 'Only real promotions should be returned');
-        for (promotion__c p : results) {
+        for (Promotion__c p : results) {
             System.assertNotEquals(fakeId, p.Id, 'Fake ID should not be included');
         }
     }
@@ -165,7 +165,7 @@ public with sharing class PromotionServiceTest {
     @isTest
     static void testGetPromotionsByIdsemptyList() {
         Test.startTest();
-            List<promotion__c> results = PromotionService.getPromotionsByIds(new List<Id>());
+            List<Promotion__c> results = PromotionService.getPromotionsByIds(new List<Id>());
         Test.stopTest();
 
   
@@ -182,7 +182,7 @@ public with sharing class PromotionServiceTest {
     List<Id> nullList = null;
 
     Test.startTest();
-        List<promotion__c> results = PromotionService.getPromotionsByIds(nullList);
+        List<Promotion__c> results = PromotionService.getPromotionsByIds(nullList);
     Test.stopTest();
 
     System.assertEquals(0, results.size(), 'Expected empty list for null input');

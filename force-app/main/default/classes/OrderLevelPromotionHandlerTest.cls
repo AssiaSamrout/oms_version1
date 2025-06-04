@@ -3,13 +3,13 @@ public with sharing class OrderLevelPromotionHandlerTest {
 
     static AdjustmentDTO prepareDTO(Boolean eligiblePromo, Boolean withCoupon) {
         List<Product2> products = TestsSetUp.createProducts();
-        order__c order = TestsSetUp.createOrder();
-        List<order_item__c> orderItems = TestsSetUp.createOrderItems(order, products);
+        Order__c order = TestsSetUp.createOrder();
+        List<Order_item__c> orderItems = TestsSetUp.createOrderItems(order, products);
 
-        List<promotion__c> promotions = TestsSetUp.makeDataForPromotionRule();
-        promotion__c promoToUse = promotions[0];
+        List<Promotion__c> promotions = TestsSetUp.makeDataForPromotionRule();
+        Promotion__c promoToUse = promotions[0];
 
-        coupon__c coupon;
+        Coupon__c coupon;
         if (withCoupon) {
          coupon = TestsSetUp.createValidCoupon(promoToUse);
         }else{
@@ -45,8 +45,8 @@ public with sharing class OrderLevelPromotionHandlerTest {
     static void testIneligibleDiscount() {
 
         AdjustmentDTO adjustmentDTO = prepareDTO(false, true);
-        RecordType rt = [SELECT Id FROM RecordType WHERE SObjectType='promotion__c' AND Name = 'order_level' LIMIT 1];
-        promotion__c promotion = new promotion__c (
+        RecordType rt = [SELECT Id FROM RecordType WHERE SObjectType='Promotion__c' AND Name = 'order_level' LIMIT 1];
+        Promotion__c promotion = new Promotion__c (
             Name='Order level promo with min amount',
             RecordTypeId = rt.Id,
             MinAmount__c = 200.0,
@@ -61,9 +61,9 @@ public with sharing class OrderLevelPromotionHandlerTest {
             Description__c = 'description of promotion 1'
         );
         insert promotion;
-        List<promotion__c> queriedPromotions = [
+        List<Promotion__c> queriedPromotions = [
         SELECT Id, Name, RecordTypeId, RecordType.Name, MinAmount__c, isAutomatic__c,Percentage__c, Type__c,usageLimit__c, usageCount__c,DiscountValue__c
-        FROM promotion__c
+        FROM Promotion__c
         WHERE Id = :promotion.Id
     ];
         adjustmentDTO.promotion = queriedPromotions[0];
@@ -105,7 +105,7 @@ public with sharing class OrderLevelPromotionHandlerTest {
         OrderLevelPromotionHandler handler = new OrderLevelPromotionHandler();
 
         Test.startTest();
-        List<order_adjustment__c> adjustments = handler.getAdjustments(adjustmentDTO);
+        List<Order_adjustment__c> adjustments = handler.getAdjustments(adjustmentDTO);
         Test.stopTest();
 
         System.assertEquals(1, adjustments.size(), 'There should be one adjustment created');

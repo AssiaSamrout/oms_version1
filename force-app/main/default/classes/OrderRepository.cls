@@ -3,8 +3,8 @@ public with sharing class OrderRepository {
      * This class is responsible for handling order-related operations such as creating and retrieving orders.
      * It interacts with the custom order__c object in Salesforce.
      */
-    public static order__c createOrderRecord(OrderResponseWrapper orderResponse) {
-        order__c newOrder = new order__c();
+    public static Order__c createOrderRecord(OrderResponseWrapper orderResponse) {
+        Order__c newOrder = new Order__c();
         newOrder.AccountId__c = orderResponse.accountId;
         newOrder.status__c = 'Draft';
         newOrder.billing_street__c = orderResponse.billingInfo.street;
@@ -30,16 +30,16 @@ public with sharing class OrderRepository {
         return newOrder;
     }
 
-    public static order__c getOrderById(Id orderId) {
+    public static Order__c getOrderById(Id orderId) {
         if (orderId == null) {
             throw new IllegalArgumentException('Order ID cannot be null');
         }
 
-        if(!order__c.SObjectType.getDescribe().isAccessible()) {
+        if(!Order__c.SObjectType.getDescribe().isAccessible()) {
             throw new SecurityException('Order object not accessible');
         }
-        List<order__c> orders = [SELECT Id, Name,SubTotal__c, AccountId__c, status__c, billing_street__c, billing_city__c, billing_country__c, billing_email__c, order_amount__c, PO_number__c, PO_date__c, order_start_date__c
-                                 FROM order__c
+        List<Order__c> orders = [SELECT Id, Name,SubTotal__c, AccountId__c, status__c, billing_street__c, billing_city__c, billing_country__c, billing_email__c, order_amount__c, PO_number__c, PO_date__c, order_start_date__c
+                                 FROM Order__c
                                  WHERE Id = :orderId];
 
         return orders[0];

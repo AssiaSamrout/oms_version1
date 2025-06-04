@@ -1,6 +1,6 @@
 public with sharing class OrderEventPublisher {
     
-    public static void publishOrderCreatedEvent(order__c order){
+    public static void publishOrderCreatedEvent(Order__c order){
         OrderCreated__e event = new OrderCreated__e(
             orderId__c = order.Id
         );

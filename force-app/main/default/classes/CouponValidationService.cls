@@ -6,7 +6,7 @@ public with sharing class CouponValidationService {
     public static CouponValidationResult validateCouponCode(String couponCode){
         try{
         CouponValidationResult result = new CouponValidationResult();
-        coupon__c coupon = CouponService.getCouponByCouponCode(couponCode);
+        Coupon__c coupon = CouponService.getCouponByCouponCode(couponCode);
         if(coupon == null) {
             result.isValid = false;
             result.errorMessage = 'Coupon not found';
@@ -24,7 +24,7 @@ public with sharing class CouponValidationService {
             return result;
         }
 
-        promotion__c promotion = PromotionService.getPromotionById(coupon.PromotionId__c);
+        Promotion__c promotion = PromotionService.getPromotionById(coupon.PromotionId__c);
         if(promotion == null) {
             result.isValid = false;
             result.errorMessage = 'Promotion not found';

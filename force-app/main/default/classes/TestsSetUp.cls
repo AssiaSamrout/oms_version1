@@ -1,22 +1,22 @@
 @isTest
 public with sharing class TestsSetUp {
 
-     public static order__c createOrder() {
+     public static Order__c createOrder() {
         // Create a test account
         Account account = new Account(Name='Test Account');
         insert account;
 
         // Create a test order
-        order__c order = new order__c(AccountId__c=account.Id, status__c='Draft',SubTotal__c=100.0);
+        Order__c order = new Order__c(AccountId__c=account.Id, status__c='Draft',SubTotal__c=100.0);
         insert order;
         return order;
     }
 
-    public static List<order_item__c> createOrderItems(order__c order, List<Product2> products) {
+    public static List<Order_item__c> createOrderItems(Order__c order, List<Product2> products) {
         // Create test order items
-        List<order_item__c> orderItems = new List<order_item__c>();
+        List<Order_item__c> orderItems = new List<Order_item__c>();
         for(Product2 prod : products){
-            order_item__c orderItem = new order_item__c(orderId__c=order.Id, 
+            Order_item__c orderItem = new Order_item__c(orderId__c=order.Id, 
                                                         Product2Id__c=prod.Id, 
                                                         quantity__c=1, 
                                                         unit_price__c=20.0,
@@ -42,14 +42,14 @@ public with sharing class TestsSetUp {
         
     }
 
-    public static List<promotion__c> makeDataForPromotionRule() {
+    public static List<Promotion__c> makeDataForPromotionRule() {
         
         // Create a test promotion
 
-        List<promotion__c> promotions = new List<promotion__c>();
+        List<Promotion__c> promotions = new List<Promotion__c>();
 
-        RecordType rt = [SELECT Id FROM RecordType WHERE SObjectType='promotion__c' AND Name = 'order_level' LIMIT 1];
-        promotion__c promotion1 = new promotion__c (
+        RecordType rt = [SELECT Id FROM RecordType WHERE SObjectType='Promotion__c' AND Name = 'order_level' LIMIT 1];
+        Promotion__c promotion1 = new Promotion__c (
             Name='Order level promo with min amount',
             RecordTypeId = rt.Id,
             MinAmount__c = null,
@@ -65,7 +65,7 @@ public with sharing class TestsSetUp {
         );
         
         promotions.add(promotion1);
-        promotion__c promotion2 = new promotion__c(
+        Promotion__c promotion2 = new Promotion__c(
             Name = 'order level promot without min amount',
             RecordTypeId = rt.Id,
             MinAmount__c = 200.0,
@@ -82,22 +82,22 @@ public with sharing class TestsSetUp {
         promotions.add(promotion2);
         
         insert promotions;
-        List<promotion__c> queriedPromotions = [
+        List<Promotion__c> queriedPromotions = [
         SELECT Id, Name, RecordTypeId, RecordType.Name, MinAmount__c, isAutomatic__c,Percentage__c, Type__c,usageLimit__c, usageCount__c,DiscountValue__c,productId__c, Description__c
-        FROM promotion__c
+        FROM Promotion__c
         WHERE Id IN :promotions
     ];
         return queriedPromotions;
     }
 
-    public static List<promotion__c> makeItemLevelPromotion() {
+    public static List<Promotion__c> makeItemLevelPromotion() {
         Product2 product = [SELECT Id FROM Product2 WHERE Name = 'Test Product 0' LIMIT 1];
         
         // Create a test promotion for item level
-        List<promotion__c> promotions = new List<promotion__c>();
+        List<Promotion__c> promotions = new List<Promotion__c>();
 
-        RecordType rt = [SELECT Id FROM RecordType WHERE SObjectType='promotion__c' AND Name = 'item_level' LIMIT 1];
-        promotion__c promotion1 = new promotion__c (
+        RecordType rt = [SELECT Id FROM RecordType WHERE SObjectType='Promotion__c' AND Name = 'item_level' LIMIT 1];
+        Promotion__c promotion1 = new Promotion__c (
             Name='Item level promo with min amount',
             RecordTypeId = rt.Id,
             MinAmount__c = 50.0,
@@ -117,17 +117,17 @@ public with sharing class TestsSetUp {
         
         insert promotions;
 
-        List<promotion__c> queriedPromotions = [
+        List<Promotion__c> queriedPromotions = [
         SELECT Id, Name, RecordTypeId, RecordType.Name, MinAmount__c, isAutomatic__c,Percentage__c, Type__c,usageLimit__c, usageCount__c,DiscountValue__c,
         productId__c, Description__c
-        FROM promotion__c
+        FROM Promotion__c
         WHERE Id IN :promotions];
 
         return queriedPromotions;
     }
 
-    public static coupon__c createValidCoupon(promotion__c promotion){
-        coupon__c coupon = new coupon__c(
+    public static Coupon__c createValidCoupon(Promotion__c promotion){
+        Coupon__c coupon = new Coupon__c(
             PromotionId__c = promotion.Id,
             Name = 'Test Coupon',
             Code__c = 'TESTCOUPON',

@@ -1,15 +1,15 @@
 public with sharing class PromotionService {
 
-    // Get a single promotion by Id, safely returning null if not found
-    public static promotion__c getPromotionById(Id promotionId) {
-        if (!promotion__c.SObjectType.getDescribe().isAccessible()) {
+    // Get a single promotion by Id, safely returning null if not found order__c
+    public static Promotion__c getPromotionById(Id promotionId) {
+        if (!Promotion__c.SObjectType.getDescribe().isAccessible()) {
             throw new SecurityException('Promotion object not accessible');
         }
 
-        List<promotion__c> promotions = [
+        List<Promotion__c> promotions = [
             SELECT Id, Name, Percentage__c, RecordTypeId, RecordType.Name, DiscountValue__c, 
                    isAutomatic__c, Type__c, activeFrom__c, activeTo__c,	productId__c,Description__c
-            FROM promotion__c
+            FROM Promotion__c
             WHERE Id = :promotionId
             LIMIT 1
         ];
@@ -18,29 +18,29 @@ public with sharing class PromotionService {
     }
 
     // Get a list of promotions by their Ids
-    public static List<promotion__c> getPromotionsByIds(List<Id> promotionIds) {
-        if (!promotion__c.SObjectType.getDescribe().isAccessible()) {
+    public static List<Promotion__c> getPromotionsByIds(List<Id> promotionIds) {
+        if (!Promotion__c.SObjectType.getDescribe().isAccessible()) {
             throw new SecurityException('Promotion object not accessible');
         }
         
          if (promotionIds == null || promotionIds.isEmpty()) {
-        return new List<promotion__c>(); 
+        return new List<Promotion__c>(); 
     }
 
         return [
             SELECT Id, Name, Percentage__c, RecordTypeId, RecordType.Name, DiscountValue__c, 
                    isAutomatic__c, Type__c, activeFrom__c, activeTo__c,Description__c,MinAmount__c
-            FROM promotion__c
+            FROM Promotion__c
             WHERE Id IN :promotionIds
         ];
     }
 
-    public static List<promotion__c> getAutoApplicablePromotions(){
-        if(!promotion__c.SObjectType.getDescribe().isAccessible()) {
+    public static List<Promotion__c> getAutoApplicablePromotions(){
+        if(!Promotion__c.SObjectType.getDescribe().isAccessible()) {
             throw new SecurityException('Promotion object not accessible');
         }
         return [SELECT Id, Name, Percentage__c, RecordType.Name,MinAmount__c,DiscountValue__c, isAutomatic__c, Type__c, activeFrom__c, activeTo__C,Description__c
-                FROM promotion__c
+                FROM Promotion__c
                 WHERE isAutomatic__c = true
                 AND activeFrom__c <= :Date.today()
                 AND (activeTo__c >= :Date.today() OR activeTo__c = null)
@@ -48,19 +48,19 @@ public with sharing class PromotionService {
     }
 
     public static List<Promotion__c> getPromotionsByIdWithAutoPromo(List<Id> promotionIds){
-        if(!promotion__c.SObjectType.getDescribe().isAccessible()) {
+        if(!Promotion__c.SObjectType.getDescribe().isAccessible()) {
             throw new SecurityException('Promotion object not accessible');
         }
         
         if (promotionIds == null || promotionIds.isEmpty()) {
-            return new List<promotion__c>(); 
+            return new List<Promotion__c>(); 
         }
 
         return [
             SELECT Id, Name, Percentage__c, RecordTypeId, RecordType.Name, DiscountValue__c, 
                    isAutomatic__c, Type__c, activeFrom__c, activeTo__c,Description__c,MinAmount__c
-            FROM promotion__c
-            WHERE Id IN :promotionIds OR 
+            FROM Promotion__c
+            WHERE Id IN :promotionIds OR /*add isactive condition */
             (isAutomatic__c = true AND activeFrom__c <= :Date.today() AND (activeTo__c >= :Date.today() OR activeTo__c = null))
         ];
     }
@@ -73,11 +73,11 @@ public with sharing class PromotionService {
         * @param promotion The promotion to check against the order.
         * @return A PromotionEligibilityResult indicating whether the order is eligible and any failure reasons.
     */
-    public static PromotionEligibilityResult isEligible(order__c order, Map<Id,List<order_item__c>> orderItemsByProduct, promotion__c promotion){
+    public static PromotionEligibilityResult isEligible(Order__c order, Map<Id,List<Order_item__c>> orderItemsByProduct, Promotion__c promotion){
         //check the rule of the promotion if it is applicable on this order using rule 
-            // promotion__c promotion = [
+            // Promotion__c promotion = [
             // SELECT Id, Name, Percentage__c,RecordTypeId, RecordType.Name,DiscountValue__c, isAutomatic__c, Type__c, activeFrom__c, activeTo__C
-            // FROM promotion__c
+            // FROM Promotion__c
             // WHERE Id = :promo.Id 
             // ];
 
@@ -100,7 +100,7 @@ public with sharing class PromotionService {
         * @return The calculated discount amount as a Decimal.
     */
 
-    public static Decimal calculateDiscount(order__c order, Map<Id,List<order_item__c>> orderItemsByProduct, promotion__c promotion){
+    public static Decimal calculateDiscount(Order__c order, Map<Id,List<Order_item__c>> orderItemsByProduct, Promotion__c promotion){
         //calculate the discount amount based on the promotion type 
         //calling promotion type factory to get the discount strategy
         System.debug('inside calculate discount');

@@ -3,19 +3,19 @@ public with sharing class CouponService {
      * This class provides methods to manage and validate coupons.
      * It includes methods to retrieve coupons by code, validate them, increment usage count, and change their active status.
      */
-    public static coupon__c getCouponByCouponCode(String code) {
+    public static Coupon__c getCouponByCouponCode(String code) {
         if(String.isBlank(code)) {
             throw new IllegalArgumentException('Coupon code cannot be null or empty');
         }
 
-        if(!coupon__c.SObjectType.getDescribe().isAccessible()){
+        if(!Coupon__c.SObjectType.getDescribe().isAccessible()){
             throw new SecurityException('Coupon object not accessible');
         }
-        List<coupon__c> results = [
+        List<Coupon__c> results = [
             SELECT Id, Name, Code__c,UsageLimit__c, UsageCount__c,IsActive__c,
                    Expiration_Date__c, PromotionId__r.Id, PromotionId__r.Name,
                    PromotionId__r.DiscountValue__c, PromotionId__r.Type__c
-            FROM coupon__c
+            FROM Coupon__c
             WHERE Code__c = :code
            //   AND (UsageLimit__c = null OR UsageCount__c < UsageLimit__c)
             LIMIT 1
@@ -23,26 +23,26 @@ public with sharing class CouponService {
         return results.isEmpty() ? null : results[0];
     }
 
-    public static List<coupon__c> getCouponsByCouponCodes(List<String> codes) {
+    public static List<Coupon__c> getCouponsByCouponCodes(List<String> codes) {
         if(codes == null || codes.isEmpty()) {
             throw new IllegalArgumentException('Coupon codes cannot be null or empty');
         }
 
-        if(!coupon__c.SObjectType.getDescribe().isAccessible()){
+        if(!Coupon__c.SObjectType.getDescribe().isAccessible()){
             throw new SecurityException('Coupon object not accessible');
         }
-        List<coupon__c> results = [
+        List<Coupon__c> results = [
             SELECT Id, Name, Code__c,UsageLimit__c, UsageCount__c,IsActive__c,
                    Expiration_Date__c, PromotionId__r.Id, PromotionId__r.Name,
                    PromotionId__r.DiscountValue__c, PromotionId__r.Type__c
-            FROM coupon__c
+            FROM Coupon__c
             WHERE Code__c IN :codes
         ];
         return results;
     }
 
 
-    public static Boolean validateCoupon(coupon__c coupon){
+    public static Boolean validateCoupon(Coupon__c coupon){
         if(coupon == null) {
             throw new IllegalArgumentException('Coupon cannot be null');
         }
@@ -66,8 +66,8 @@ public with sharing class CouponService {
 
     }
 
-    public static void incrementUsageCount(coupon__c coupon){
-        if(!coupon__c.SObjectType.getDescribe().isUpdateable()){
+    public static void incrementUsageCount(Coupon__c coupon){
+        if(!Coupon__c.SObjectType.getDescribe().isUpdateable()){
             throw new SecurityException('Coupon object not updatable');
         }
         if(coupon == null){
@@ -81,8 +81,8 @@ public with sharing class CouponService {
         update coupon;
     }
 
-    public static void changeIsActive(coupon__c coupon, Boolean isActive){
-        if(!coupon__c.SObjectType.getDescribe().isUpdateable()){
+    public static void changeIsActive(Coupon__c coupon, Boolean isActive){
+        if(!Coupon__c.SObjectType.getDescribe().isUpdateable()){
             throw new SecurityException('Coupon object not updatable');
         }
         if(coupon == null){

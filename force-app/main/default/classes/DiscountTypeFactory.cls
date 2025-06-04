@@ -6,7 +6,7 @@ public with sharing class DiscountTypeFactory {
         * @return An instance of IDiscountStrategy corresponding to the promotion type.
         * @throws PromoException if the promotion type is invalid.
     */ 
-    public static IDiscountStrategy getDiscountStrategy(promotion__c promotion){
+    public static IDiscountStrategy getDiscountStrategy(Promotion__c promotion){
         if(promotion.Type__c == 'Percentage'){
             System.debug('inside percentage discount strategy factory');
             return new PercentageDiscountStrategy();

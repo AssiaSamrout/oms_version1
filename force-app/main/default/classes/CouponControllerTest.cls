@@ -5,13 +5,13 @@ public with sharing class CouponControllerTest {
         Map<String,Object> payload = new Map<String,Object>();
 
         List<Product2> products = TestsSetUp.createProducts();
-        order__c order = TestsSetUp.createOrder();
-        List<order_item__c> orderItems = TestsSetUp.createOrderItems(order, products);
+        Order__c order = TestsSetUp.createOrder();
+        List<Order_item__c> orderItems = TestsSetUp.createOrderItems(order, products);
 
-        List<promotion__c> promotions = TestsSetUp.makeDataForPromotionRule();
-        promotion__c promoToUse = promotions[0];
+        List<Promotion__c> promotions = TestsSetUp.makeDataForPromotionRule();
+        Promotion__c promoToUse = promotions[0];
 
-        coupon__c coupon = TestsSetUp.createValidCoupon(promoToUse);
+        Coupon__c coupon = TestsSetUp.createValidCoupon(promoToUse);
         Account account = [SELECT Id FROM Account WHERE Name= 'Test Account' LIMIT 1][0];
         payload.put('subtotal', order.SubTotal__c);
         payload.put('accountId', account.Id); 

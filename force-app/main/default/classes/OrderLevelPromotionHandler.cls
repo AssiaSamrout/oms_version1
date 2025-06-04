@@ -11,14 +11,14 @@ public with sharing class OrderLevelPromotionHandler implements IPromotionLevelH
         return PromotionService.calculateDiscount(adjustmentDTO.order, adjustmentDTO.orderItemsByProductId, adjustmentDTO.promotion);
     }
 
-    public List<order_adjustment__c> getAdjustments(AdjustmentDTO adjustmentDTO) {
+    public List<Order_adjustment__c> getAdjustments(AdjustmentDTO adjustmentDTO) {
         Decimal discount = calculateDiscount(adjustmentDTO);
-        Id orderLevelRT = Schema.SObjectType.order_adjustment__c
+        Id orderLevelRT = Schema.SObjectType.Order_adjustment__c
                             .getRecordTypeInfosByDeveloperName()
                             .get('order_level')
                             .getRecordTypeId();
 
-        order_adjustment__c adjustment = new order_adjustment__c();
+        Order_adjustment__c adjustment = new Order_adjustment__c();
         adjustment.orderName__c = adjustmentDTO.order.Id;
         adjustment.order_item_Name__c = null;
         adjustment.promotionName__c = adjustmentDTO.promotion.Id;
@@ -27,7 +27,7 @@ public with sharing class OrderLevelPromotionHandler implements IPromotionLevelH
         adjustment.RecordTypeId = orderLevelRT;
         adjustment.Description__c = 'Order Level Promotion: ' + adjustmentDTO.promotion.Name;
 
-        return new List<order_adjustment__c> { adjustment };
+        return new List<Order_adjustment__c> { adjustment };
     }
 
     public void applySideEffects(AdjustmentDTO adjustmentDTO) {

@@ -4,7 +4,7 @@ public with sharing class PromotionRulesEngine {
         * It retrieves the rules from custom metadata and applies them to the order and its items.
         * the retrieved rules are fetched based on the promotion's record type.(order level or item level)
     */
-    public static PromotionEligibilityResult isEligible(order__c order,Map<Id,List<order_item__c>> orderItemsByProduct, promotion__c promotion) {
+    public static PromotionEligibilityResult isEligible(Order__c order,Map<Id,List<order_item__c>> orderItemsByProduct, promotion__c promotion) {
        
         PromotionEligibilityResult result = new PromotionEligibilityResult(true);
         System.debug('inside promotionengine first log');

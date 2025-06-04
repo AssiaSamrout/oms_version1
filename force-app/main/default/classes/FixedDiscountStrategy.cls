@@ -9,8 +9,9 @@ public with sharing class FixedDiscountStrategy implements IDiscountStrategy {
         * @param promotion The promotion to calculate the discount from.
         * @return The fixed discount value as specified in the promotion.
         * @throws IllegalArgumentException if the DiscountValue__c is null or negative, or if Percentage__c is set.
+        order__c
     */
-    public Decimal calculateDiscount(order__c order, Map<Id,List<order_item__c>> orderItemsByProduct, promotion__c promotion) {
+    public Decimal calculateDiscount(Order__c order, Map<Id,List<Order_item__c>> orderItemsByProduct, Promotion__c promotion) {
         if (promotion.DiscountValue__c == null) {
             throw new IllegalArgumentException('Discount value cannot be null');
         }

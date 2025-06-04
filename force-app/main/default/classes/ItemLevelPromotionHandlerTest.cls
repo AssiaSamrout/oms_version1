@@ -2,11 +2,11 @@
 public with sharing class ItemLevelPromotionHandlerTest {
     static AdjustmentDTO prepareDTO(Boolean eligiblePromo, Boolean withCoupon) {
         List<Product2> products = TestsSetUp.createProducts();
-        order__c order = TestsSetUp.createOrder();
-        List<order_item__c> orderItems = TestsSetUp.createOrderItems(order, products);
+        Order__c order = TestsSetUp.createOrder();
+        List<Order_item__c> orderItems = TestsSetUp.createOrderItems(order, products);
 
-        List<promotion__c> promotions = TestsSetUp.makeItemLevelPromotion();
-        promotion__c promoToUse = promotions[0];
+        List<Promotion__c> promotions = TestsSetUp.makeItemLevelPromotion();
+        Promotion__c promoToUse = promotions[0];
 
         coupon__c coupon;
         if (withCoupon) {
@@ -45,8 +45,8 @@ public with sharing class ItemLevelPromotionHandlerTest {
                                         IsActive=true);
         insert prod;
         System.debug('INSIDE TEST INELIHIBLE DISCOUNT PRODUCT ID: ' + prod.Id);
-        RecordType rt = [SELECT Id FROM RecordType WHERE SObjectType='promotion__c' AND Name = 'item_level' LIMIT 1];
-        promotion__c promotion = new promotion__c (
+        RecordType rt = [SELECT Id FROM RecordType WHERE SObjectType='Promotion__c' AND Name = 'item_level' LIMIT 1];
+        Promotion__c promotion = new Promotion__c (
             Name='Item level promo with min amount',
             RecordTypeId = rt.Id,
             MinAmount__c = null,
@@ -62,10 +62,10 @@ public with sharing class ItemLevelPromotionHandlerTest {
             Description__c = 'description of item level promotion 2'
         );
         insert promotion;
-        List<promotion__c> queriedPromotions = [
+        List<Promotion__c> queriedPromotions = [
         SELECT Id, Name, RecordTypeId, RecordType.Name, MinAmount__c, isAutomatic__c,Percentage__c, Type__c,usageLimit__c, usageCount__c,DiscountValue__c,
                productId__c, Description__c
-        FROM promotion__c
+        FROM Promotion__c
         WHERE Id = :promotion.Id
     ];
         adjustmentDTO.promotion = queriedPromotions[0];
@@ -102,7 +102,7 @@ public with sharing class ItemLevelPromotionHandlerTest {
         ItemLevelPromotionHandler handler = new ItemLevelPromotionHandler();
 
         Test.startTest();
-        List<order_adjustment__c> adjustments = handler.getAdjustments(adjustmentDTO);
+        List<Order_adjustment__c> adjustments = handler.getAdjustments(adjustmentDTO);
         Test.stopTest();
         System.debug('INSIDE GET ADJUSTMENTS: ' + adjustments.size());
         System.debug('ADJUSTMENTS: ' + adjustments);

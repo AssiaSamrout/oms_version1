@@ -6,7 +6,7 @@ public with sharing class OrderItemCreationTest {
         acc.Name = 'Test Account';
         acc.Phone = '1234567890';
         insert acc;
-        order__c order = new order__c();
+        Order__c order = new Order__c();
         order.AccountId__c = acc.Id;  
         order.status__c = 'Draft';
         order.billing_street__c = '123 Main St';
@@ -46,13 +46,13 @@ public with sharing class OrderItemCreationTest {
             items.add(item);
         }
 
-        Id orderId = [Select Id from order__c limit 1].Id;
+        Id orderId = [Select Id from Order__c limit 1].Id;
         Test.startTest();
         OrderItemService.InsertResult result= OrderItemService.insertOrderItems(items, orderId);
         Test.stopTest();
-        List<order_item__c> orderItems = [SELECT Id, Product2Id__c, Name, quantity__c, unit_price__c, total_price__c, description__c FROM order_item__c WHERE orderId__c = :orderId];
+        List<Order_item__c> orderItems = [SELECT Id, Product2Id__c, Name, quantity__c, unit_price__c, total_price__c, description__c FROM Order_item__c WHERE orderId__c = :orderId];
         System.assertEquals(3, orderItems.size(), 'Order items count should be 5');
-        for(order_item__c orderItem : orderItems){
+        for(Order_item__c orderItem : orderItems){
             System.assertNotEquals(null, orderItem.Product2Id__c, 'Product2Id should not be null');
             System.assertNotEquals(null, orderItem.Name, 'Name should not be null');
             System.assertNotEquals(null, orderItem.quantity__c, 'Quantity should not be null');
@@ -77,7 +77,7 @@ public with sharing class OrderItemCreationTest {
         item.totalPrice = 100.00;
         item.description = 'Test Description';
         items.add(item);
-        Id orderId = [Select Id from order__c limit 1].Id;
+        Id orderId = [Select Id from Order__c limit 1].Id;
         Test.startTest();
         OrderItemService.InsertResult result = OrderItemService.insertOrderItems(items, orderId);
         System.assertEquals(0, result.successfulItems.size(), 'Successful items count should be 0');
@@ -97,7 +97,7 @@ public with sharing class OrderItemCreationTest {
         item.totalPrice = 100.00;
         item.description = 'Test Description';
         items.add(item);
-        Id orderId = [Select Id from order__c limit 1].Id;
+        Id orderId = [Select Id from Order__c limit 1].Id;
         Test.startTest();
         try{
         OrderItemService.InsertResult result = OrderItemService.insertOrderItems(items, orderId);
@@ -119,7 +119,7 @@ public with sharing class OrderItemCreationTest {
         item.totalPrice = 100.00;
         item.description = 'Test Description';
 
-        Id orderId = [Select Id from order__c limit 1].Id;
+        Id orderId = [Select Id from Order__c limit 1].Id;
 
         Test.startTest();
         try {

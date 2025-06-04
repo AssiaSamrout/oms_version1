@@ -10,12 +10,12 @@ public with sharing class ProductsMatchingRule implements IPromotionRule {
         * @param promotion The promotion to check against the order.
         * @return true if the order is eligible for the promotion, false otherwise.
     */
-    public Boolean isEligible(order__c order, Map<Id,List<order_item__c>> orderItemsByProduct, promotion__c promotion) {
+    public Boolean isEligible(Order__c order, Map<Id,List<Order_item__c>> orderItemsByProduct, Promotion__c promotion) {
         if (promotion.productId__c == null) {
             return false;
         }
 
-        List<order_item__c> items = orderItemsByProduct.get(promotion.productId__c);
+        List<Order_item__c> items = orderItemsByProduct.get(promotion.productId__c);
         if (items != null && !items.isEmpty()) {
             return true; 
         }
@@ -24,19 +24,5 @@ public with sharing class ProductsMatchingRule implements IPromotionRule {
     }
 
 
-
-    // public Boolean isEligible(order__c order, Map<Id,List<order_item__c>> orderItemsByProduct, promotion__c promotion) {
-    //     if (promotion.productId__c == null) {
-    //         return false;
-    //     }
-
-    //     for (order_item__c item : orderItems) {
-    //         if (item.Product2Id__c == promotion.productId__c) {
-    //             return true; 
-    //         }
-    //     }
-
-    //     return false; // No match found
-    // }
     
 }

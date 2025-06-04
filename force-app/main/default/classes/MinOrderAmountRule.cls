@@ -1,11 +1,4 @@
 public with sharing class MinOrderAmountRule implements IPromotionRule{
-    // public Boolean isEligible(order__c order, List<order_item__c> orderItems, promotion__c promotion){
-    //     if(order.SubTotal__c == null) {
-    //         throw new IllegalArgumentException('Order amount cannot be null');
-    //     }
-    //     return promotion.MinAmount__c == null || order.SubTotal__c >= promotion.MinAmount__c;
-    // }
-
     /*
         * This method checks if the order is eligible for a promotion based on the minimum order amount rule.
         * It verifies if the order's SubTotal__c meets the minimum amount specified in the promotion.
@@ -16,7 +9,7 @@ public with sharing class MinOrderAmountRule implements IPromotionRule{
         * @param promotion The promotion to check against the order.
         * @return true if the order is eligible for the promotion, false otherwise.
     */
-    public Boolean isEligible(order__c order, Map<Id,List<order_item__c>> orderItemsByProduct, promotion__c promotion) {
+    public Boolean isEligible(Order__c order, Map<Id,List<Order_item__c>> orderItemsByProduct, Promotion__c promotion) {
         if (order.SubTotal__c == null) {
             throw new IllegalArgumentException('Order amount cannot be null');
         }

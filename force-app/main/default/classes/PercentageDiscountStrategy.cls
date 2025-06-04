@@ -11,7 +11,7 @@ public with sharing class PercentageDiscountStrategy implements IDiscountStrateg
         * @return The calculated discount amount as a Decimal.
         * @throws IllegalArgumentException if both Percentage and DiscountValue are null or if both are set.
     */
-    public Decimal calculateDiscount(order__c order, Map<Id,List<order_item__c>> orderItemsByProduct, promotion__c promotion){
+    public Decimal calculateDiscount(Order__c order, Map<Id,List<Order_item__c>> orderItemsByProduct, Promotion__c promotion){
 
         System.debug('inside percentage discount strategy');
         if(promotion.Percentage__c == null && promotion.DiscountValue__c == null) {
@@ -32,13 +32,13 @@ public with sharing class PercentageDiscountStrategy implements IDiscountStrateg
 
     }
 
-    private Decimal getTotalitems(Map<Id, List<order_item__c>> orderItemsByProduct, Id productId) {
+    private Decimal getTotalitems(Map<Id, List<Order_item__c>> orderItemsByProduct, Id productId) {
         Decimal total = 0;
 
-        List<order_item__c> items = orderItemsByProduct.get(productId);
+        List<Order_item__c> items = orderItemsByProduct.get(productId);
 
         if (items != null) {
-            for (order_item__c item : items) {
+            for (Order_item__c item : items) {
                 total += (item.unit_price__c * item.quantity__c);
             }
         }

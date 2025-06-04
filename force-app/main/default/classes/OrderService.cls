@@ -7,14 +7,15 @@ public with sharing class OrderService {
         * @return An OrderProcessingResult indicating success or failure of the order creation.
         * @throws IllegalArgumentException if the orderResponse is null or invalid.
         * @throws DmlException if there is an error during the order creation process.
-        * @throws Exception for any unexpected errors during order processing.
+        * @throws Exception for any unexpected errors during order processing.\
+      
     */
     public OrderProcessingResult createOrder(OrderResponseWrapper orderResponse) {
         OrderProcessingResult result = new OrderProcessingResult();
         Savepoint sp = Database.setSavepoint();
 
         try {
-            order__c newOrder = OrderRepository.createOrderRecord(orderResponse);
+            Order__c newOrder = OrderRepository.createOrderRecord(orderResponse);
 
             OrderItemService.InsertResult insertResult = OrderItemService.insertOrderItems(orderResponse.items, newOrder.Id);
 
@@ -38,13 +39,13 @@ public with sharing class OrderService {
         return result;
     }
 
-    public static order__c getOrderById(Id orderId){
+    public static Order__c getOrderById(Id orderId){
         if (orderId == null) {
             System.debug('inside OrderService: Order ID cannot be null');
             throw new IllegalArgumentException('Order ID cannot be null');
         }
 
-        order__c order = OrderRepository.getOrderById(orderId);
+        Order__c order = OrderRepository.getOrderById(orderId);
         if (order == null) {
             System.debug('inside OrderService: Order not found with ID: ' + orderId);
             throw new IllegalArgumentException('Order not found with ID: ' + orderId);
@@ -53,9 +54,9 @@ public with sharing class OrderService {
         return order;
     }
 
-    public static Decimal calculateTotalAmount(List<order_item__c> orderItems) {
+    public static Decimal calculateTotalAmount(List<Order_item__c> orderItems) {
         Decimal totalAmount = 0;
-        for (order_item__c item : orderItems) {
+        for (Order_item__c item : orderItems) {
             totalAmount += item.unit_price__c * item.quantity__c;
         }
         return totalAmount;

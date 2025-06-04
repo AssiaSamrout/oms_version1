@@ -65,21 +65,21 @@ insert limitReachedCoupon;
 
     @isTest
     static void testGetCouponByCouponCode() {
-        coupon__c coupon = CouponService.getCouponByCouponCode('VALID123');
+        Coupon__c coupon = CouponService.getCouponByCouponCode('VALID123');
         System.assertNotEquals(null, coupon, 'Coupon should be found');
         System.assertEquals('VALID123', coupon.Code__c, 'Coupon code should match');
     }
 
     @isTest
     static void testGetCouponByInvalidCode() {
-        coupon__c coupon = CouponService.getCouponByCouponCode('INVALIDCODE');
+        Coupon__c coupon = CouponService.getCouponByCouponCode('INVALIDCODE');
         System.assertEquals(null, coupon, 'Invalid code should return null');
     }
 
     @isTest
     static void testValidateCouponValid(){
-        coupon__c coupon = [SELECT Id, IsActive__c, PromotionId__r.Id, Expiration_date__c, UsageLimit__c, UsageCount__c
-                            FROM coupon__c WHERE Code__c = 'VALID123' LIMIT 1];
+        Coupon__c coupon = [SELECT Id, IsActive__c, PromotionId__r.Id, Expiration_date__c, UsageLimit__c, UsageCount__c
+                            FROM Coupon__c WHERE Code__c = 'VALID123' LIMIT 1];
         Test.startTest();
        Boolean result = CouponService.validateCoupon(coupon);
         Test.stopTest();
@@ -89,7 +89,7 @@ insert limitReachedCoupon;
 
     @isTest
     static void testValidateCouponInactive() {
-        coupon__c coupon = [SELECT Id, IsActive__c, PromotionId__r.Id FROM coupon__c WHERE Code__c = 'INACTIVE'];
+        Coupon__c coupon = [SELECT Id, IsActive__c, PromotionId__r.Id FROM Coupon__c WHERE Code__c = 'INACTIVE'];
         Test.startTest();
         try {
           Boolean result =  CouponService.validateCoupon(coupon);
@@ -102,8 +102,8 @@ insert limitReachedCoupon;
 
     @isTest
     static void testValidateCouponExpired() {
-        coupon__c coupon = [SELECT Id, IsActive__c, Expiration_date__c, PromotionId__r.Id
-                            FROM coupon__c WHERE Code__c = 'EXPIRED'];
+        Coupon__c coupon = [SELECT Id, IsActive__c, Expiration_date__c, PromotionId__r.Id
+                            FROM Coupon__c WHERE Code__c = 'EXPIRED'];
         Test.startTest();
         try {
           Boolean result =  CouponService.validateCoupon(coupon);
@@ -116,8 +116,8 @@ insert limitReachedCoupon;
 
     @isTest
     static void testValidateCouponUsageLimitReached() {
-        coupon__c coupon = [SELECT Id, IsActive__c, UsageCount__c, UsageLimit__c, PromotionId__r.Id, Expiration_date__c
-                            FROM coupon__c WHERE Code__c = 'LIMITED'];
+        Coupon__c coupon = [SELECT Id, IsActive__c, UsageCount__c, UsageLimit__c, PromotionId__r.Id, Expiration_date__c
+                            FROM Coupon__c WHERE Code__c = 'LIMITED'];
         Test.startTest();
         try {
             Boolean result = CouponService.validateCoupon(coupon);
@@ -130,24 +130,24 @@ insert limitReachedCoupon;
 
     @isTest
     static void testIncrementUsageCount() {
-        coupon__c coupon = [SELECT Id, UsageCount__c FROM coupon__c WHERE Code__c = 'VALID123'];
+        Coupon__c coupon = [SELECT Id, UsageCount__c FROM Coupon__c WHERE Code__c = 'VALID123'];
         Decimal previousCount = coupon.UsageCount__c;
         Test.startTest();
         CouponService.incrementUsageCount(coupon);
         Test.stopTest();
 
-        coupon = [SELECT UsageCount__c FROM coupon__c WHERE Id = :coupon.Id];
+        coupon = [SELECT UsageCount__c FROM Coupon__c WHERE Id = :coupon.Id];
         System.assertEquals(previousCount + 1, coupon.UsageCount__c, 'Usage count should have incremented');
     }
 
     @isTest
     static void testChangeIsActive() {
-        coupon__c coupon = [SELECT Id, IsActive__c FROM coupon__c WHERE Code__c = 'VALID123'];
+        Coupon__c coupon = [SELECT Id, IsActive__c FROM Coupon__c WHERE Code__c = 'VALID123'];
         Test.startTest();
         CouponService.changeIsActive(coupon, false);
         Test.stopTest();
 
-        coupon = [SELECT IsActive__c FROM coupon__c WHERE Id = :coupon.Id];
+        coupon = [SELECT IsActive__c FROM Coupon__c WHERE Id = :coupon.Id];
         System.assertEquals(false, coupon.IsActive__c, 'Coupon should now be inactive');
     }
 }
