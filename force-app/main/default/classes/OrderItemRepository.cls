@@ -15,9 +15,9 @@ public with sharing class OrderItemRepository {
             throw new IllegalArgumentException('Order ID cannot be null');
         }
         
-        List<Order_item__c> orderItems = [SELECT Id, Name, quantity__c, total_price__c, unit_price__c, Product2Id__c
+        List<Order_item__c> orderItems = [SELECT Id, Name, Quantity__c, Total_price__c, Unit_price__c, Product2Id__c
                                            FROM Order_item__c 
-                                           WHERE orderId__c = :orderId];
+                                           WHERE OrderId__c = :orderId];
         return orderItems;
     }
 

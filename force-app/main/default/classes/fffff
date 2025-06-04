@@ -21,7 +21,7 @@ public class PercentageDiscountStrategy implements IDiscountStrategy {
         Decimal total = 0;
         for (order_item__c item : items) {
             if (item.Product2Id__c == productId) {
-                total += item.unit_price__c * item.quantity__c;
+                total += item.Unit_price__c * item.Quantity__c;
             }
         }
         return total;
@@ -106,7 +106,7 @@ public with sharing class PostCheckoutDiscountProcessor {
         try {
             order__c order = OrderService.getOrderById(orderId);
             List<order_item__c> items = [
-                SELECT Id, unit_price__c, quantity__c, Product2Id__c FROM order_item__c WHERE order__c = :orderId
+                SELECT Id, Unit_price__c, Quantity__c, Product2Id__c FROM order_item__c WHERE order__c = :orderId
             ];
 
             List<OrderAdjustment__c> allAdjustments = new List<OrderAdjustment__c>();

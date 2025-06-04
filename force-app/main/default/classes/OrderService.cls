@@ -57,7 +57,7 @@ public with sharing class OrderService {
     public static Decimal calculateTotalAmount(List<Order_item__c> orderItems) {
         Decimal totalAmount = 0;
         for (Order_item__c item : orderItems) {
-            totalAmount += item.unit_price__c * item.quantity__c;
+            totalAmount += item.Unit_price__c * item.Quantity__c;
         }
         return totalAmount;
     }

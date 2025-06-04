@@ -39,7 +39,7 @@ public with sharing class PercentageDiscountStrategy implements IDiscountStrateg
 
         if (items != null) {
             for (Order_item__c item : items) {
-                total += (item.unit_price__c * item.quantity__c);
+                total += (item.Unit_price__c * item.Quantity__c);
             }
         }
 

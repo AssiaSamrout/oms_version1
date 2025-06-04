@@ -71,13 +71,13 @@ public with sharing class OrderItemService {
             }
 
             Order_item__c oi = new Order_item__c(
-                orderId__c = orderId,
+                OrderId__c = orderId,
                 Product2Id__c = product.Id,
                 Name = item.productName,
-                quantity__c = item.quantity,
-                unit_price__c = item.unitPrice,
-                total_price__c = item.totalPrice,
-                description__c = item.description
+                Quantity__c = item.quantity,
+                Unit_price__c = item.unitPrice,
+                Total_price__c = item.totalPrice,
+                Description__c = item.description
             );
             orderItems.add(oi);
         }

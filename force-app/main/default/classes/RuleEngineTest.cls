@@ -27,11 +27,11 @@ public with sharing class RuleEngineTest {
             Name='Order level promo with min amount',
             RecordTypeId = rt.Id,
             MinAmount__c = 100.0,
-            activeFrom__c = Date.Today(),
-            activeTo__c = Date.Today().addDays(30),
-            isAutomatic__c = true,
-            usageLimit__c = 10,
-            usageCount__c = 0,
+            ActiveFrom__c = Date.Today(),
+            ActiveTo__c = Date.Today().addDays(30),
+            IsAutomatic__c = true,
+            UsageLimit__c = 10,
+            UsageCount__c = 0,
             Description__c = 'Test promotion for order level eligibility'
         );
         insert promotion;
@@ -66,15 +66,15 @@ public with sharing class RuleEngineTest {
             Name='Order level promo with min amount',
             RecordTypeId = rt.Id,
             MinAmount__c = 500.0,
-            activeFrom__c = Date.Today(),
-            activeTo__c = Date.Today().addDays(30),
-            isAutomatic__c = true,
-            usageLimit__c = 10,
-            usageCount__c = 0,
+            ActiveFrom__c = Date.Today(),
+            ActiveTo__c = Date.Today().addDays(30),
+            IsAutomatic__c = true,
+            UsageLimit__c = 10,
+            UsageCount__c = 0,
             Description__c = 'Test promotion for order level eligibility'
         );
         insert promotion1;
-        Promotion__c promotion = [SELECT Id, Name, RecordTypeId, RecordType.Name, MinAmount__c, isAutomatic__c
+        Promotion__c promotion = [SELECT Id, Name, RecordTypeId, RecordType.Name, MinAmount__c, IsAutomatic__c
         FROM Promotion__c
         WHERE Id = :promotion1.Id];
         Test.startTest();

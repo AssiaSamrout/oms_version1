@@ -8,7 +8,7 @@ public with sharing class PromotionService {
 
         List<Promotion__c> promotions = [
             SELECT Id, Name, Percentage__c, RecordTypeId, RecordType.Name, DiscountValue__c, 
-                   isAutomatic__c, Type__c, activeFrom__c, activeTo__c,	productId__c,Description__c
+                   IsAutomatic__c, Type__c, ActiveFrom__c, ActiveTo__c,	productId__c,Description__c
             FROM Promotion__c
             WHERE Id = :promotionId
             LIMIT 1
@@ -29,7 +29,7 @@ public with sharing class PromotionService {
 
         return [
             SELECT Id, Name, Percentage__c, RecordTypeId, RecordType.Name, DiscountValue__c, 
-                   isAutomatic__c, Type__c, activeFrom__c, activeTo__c,Description__c,MinAmount__c
+                   IsAutomatic__c, Type__c, ActiveFrom__c, ActiveTo__c,Description__c,MinAmount__c
             FROM Promotion__c
             WHERE Id IN :promotionIds
         ];
@@ -39,11 +39,11 @@ public with sharing class PromotionService {
         if(!Promotion__c.SObjectType.getDescribe().isAccessible()) {
             throw new SecurityException('Promotion object not accessible');
         }
-        return [SELECT Id, Name, Percentage__c, RecordType.Name,MinAmount__c,DiscountValue__c, isAutomatic__c, Type__c, activeFrom__c, activeTo__C,Description__c
+        return [SELECT Id, Name, Percentage__c, RecordType.Name,MinAmount__c,DiscountValue__c, IsAutomatic__c, Type__c, ActiveFrom__c, activeTo__C,Description__c
                 FROM Promotion__c
-                WHERE isAutomatic__c = true
-                AND activeFrom__c <= :Date.today()
-                AND (activeTo__c >= :Date.today() OR activeTo__c = null)
+                WHERE IsAutomatic__c = true
+                AND ActiveFrom__c <= :Date.today()
+                AND (ActiveTo__c >= :Date.today() OR ActiveTo__c = null)
         ];
     }
 
@@ -58,10 +58,10 @@ public with sharing class PromotionService {
 
         return [
             SELECT Id, Name, Percentage__c, RecordTypeId, RecordType.Name, DiscountValue__c, 
-                   isAutomatic__c, Type__c, activeFrom__c, activeTo__c,Description__c,MinAmount__c
+                   IsAutomatic__c, Type__c, ActiveFrom__c, ActiveTo__c,Description__c,MinAmount__c
             FROM Promotion__c
             WHERE Id IN :promotionIds OR /*add isactive condition */
-            (isAutomatic__c = true AND activeFrom__c <= :Date.today() AND (activeTo__c >= :Date.today() OR activeTo__c = null))
+            (IsAutomatic__c = true AND ActiveFrom__c <= :Date.today() AND (ActiveTo__c >= :Date.today() OR ActiveTo__c = null))
         ];
     }
 
@@ -76,7 +76,7 @@ public with sharing class PromotionService {
     public static PromotionEligibilityResult isEligible(Order__c order, Map<Id,List<Order_item__c>> orderItemsByProduct, Promotion__c promotion){
         //check the rule of the promotion if it is applicable on this order using rule 
             // Promotion__c promotion = [
-            // SELECT Id, Name, Percentage__c,RecordTypeId, RecordType.Name,DiscountValue__c, isAutomatic__c, Type__c, activeFrom__c, activeTo__C
+            // SELECT Id, Name, Percentage__c,RecordTypeId, RecordType.Name,DiscountValue__c, IsAutomatic__c, Type__c, ActiveFrom__c, activeTo__C
             // FROM Promotion__c
             // WHERE Id = :promo.Id 
             // ];

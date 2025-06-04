@@ -7,7 +7,7 @@ public with sharing class TestsSetUp {
         insert account;
 
         // Create a test order
-        Order__c order = new Order__c(AccountId__c=account.Id, status__c='Draft',SubTotal__c=100.0);
+        Order__c order = new Order__c(AccountId__c=account.Id, Status__c='Draft',SubTotal__c=100.0);
         insert order;
         return order;
     }
@@ -16,11 +16,11 @@ public with sharing class TestsSetUp {
         // Create test order items
         List<Order_item__c> orderItems = new List<Order_item__c>();
         for(Product2 prod : products){
-            Order_item__c orderItem = new Order_item__c(orderId__c=order.Id, 
+            Order_item__c orderItem = new Order_item__c(OrderId__c=order.Id, 
                                                         Product2Id__c=prod.Id, 
-                                                        quantity__c=1, 
-                                                        unit_price__c=20.0,
-                                                        total_price__c=20.0);
+                                                        Quantity__c=1, 
+                                                        Unit_price__c=20.0,
+                                                        Total_price__c=20.0);
             orderItems.add(orderItem);
         }
         insert orderItems;
@@ -53,11 +53,11 @@ public with sharing class TestsSetUp {
             Name='Order level promo with min amount',
             RecordTypeId = rt.Id,
             MinAmount__c = null,
-            activeFrom__c = Date.Today(),
-            activeTo__c = Date.Today().addDays(30),
-            isAutomatic__c = true,
-            usageLimit__c = 10,
-            usageCount__c = 0,
+            ActiveFrom__c = Date.Today(),
+            ActiveTo__c = Date.Today().addDays(30),
+            IsAutomatic__c = true,
+            UsageLimit__c = 10,
+            UsageCount__c = 0,
             Type__c= 'Percentage',
             Percentage__c = 10.0,
             DiscountValue__c = null,
@@ -69,11 +69,11 @@ public with sharing class TestsSetUp {
             Name = 'order level promot without min amount',
             RecordTypeId = rt.Id,
             MinAmount__c = 200.0,
-            activeFrom__c = Date.Today(),
-            activeTo__c = Date.Today().addDays(30),
-            isAutomatic__c = false,
-            usageLimit__c = 10,
-            usageCount__c = 0,
+            ActiveFrom__c = Date.Today(),
+            ActiveTo__c = Date.Today().addDays(30),
+            IsAutomatic__c = false,
+            UsageLimit__c = 10,
+            UsageCount__c = 0,
             Type__c= 'Percentage',
             Percentage__c = 20.0,
             DiscountValue__c = null,
@@ -83,7 +83,7 @@ public with sharing class TestsSetUp {
         
         insert promotions;
         List<Promotion__c> queriedPromotions = [
-        SELECT Id, Name, RecordTypeId, RecordType.Name, MinAmount__c, isAutomatic__c,Percentage__c, Type__c,usageLimit__c, usageCount__c,DiscountValue__c,productId__c, Description__c
+        SELECT Id, Name, RecordTypeId, RecordType.Name, MinAmount__c, IsAutomatic__c,Percentage__c, Type__c,UsageLimit__c, UsageCount__c,DiscountValue__c,productId__c, Description__c
         FROM Promotion__c
         WHERE Id IN :promotions
     ];
@@ -101,11 +101,11 @@ public with sharing class TestsSetUp {
             Name='Item level promo with min amount',
             RecordTypeId = rt.Id,
             MinAmount__c = 50.0,
-            activeFrom__c = Date.Today(),
-            activeTo__c = Date.Today().addDays(30),
-            isAutomatic__c = true,
-            usageLimit__c = 5,
-            usageCount__c = 0,
+            ActiveFrom__c = Date.Today(),
+            ActiveTo__c = Date.Today().addDays(30),
+            IsAutomatic__c = true,
+            UsageLimit__c = 5,
+            UsageCount__c = 0,
             Type__c= 'Percentage',
             Percentage__c = 15.0,
             DiscountValue__c = null,
@@ -118,7 +118,7 @@ public with sharing class TestsSetUp {
         insert promotions;
 
         List<Promotion__c> queriedPromotions = [
-        SELECT Id, Name, RecordTypeId, RecordType.Name, MinAmount__c, isAutomatic__c,Percentage__c, Type__c,usageLimit__c, usageCount__c,DiscountValue__c,
+        SELECT Id, Name, RecordTypeId, RecordType.Name, MinAmount__c, IsAutomatic__c,Percentage__c, Type__c,UsageLimit__c, UsageCount__c,DiscountValue__c,
         productId__c, Description__c
         FROM Promotion__c
         WHERE Id IN :promotions];

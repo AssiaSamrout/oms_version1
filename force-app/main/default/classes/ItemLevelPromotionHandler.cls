@@ -21,12 +21,13 @@ public with sharing class ItemLevelPromotionHandler implements IPromotionLevelHa
         List<Order_adjustment__C> adjustments = new List<Order_adjustment__C>();
         for(Order_item__c orderItem : adjustmentDTO.orderItems){
         Order_adjustment__C adjustment = new Order_adjustment__C();
-        adjustment.orderName__c = adjustmentDTO.order.Id;
-              adjustment.order_item_Name__c = orderItem.Id;
-              adjustment.promotionName__c = adjustmentDTO.promotion.Id;
-              adjustment.couponName__c = (adjustmentDTO.coupon != null ? adjustmentDTO.coupon.Id : null);
+        adjustment.OrderName__c = adjustmentDTO.order.Id;
+              adjustment.Order_item_Name__c = orderItem.Id;
+              adjustment.PromotionName__c = adjustmentDTO.promotion.Id;
+              adjustment.CouponName__c = (adjustmentDTO.coupon != null ? adjustmentDTO.coupon.Id : null);
               adjustment.Amount__c = discount;
               adjustment.RecordTypeId = itemLevelRT;
+              adjustment.Created_date__c = System.now().date();
                 adjustment.Description__c = 'Item Level Promotion: ' + adjustmentDTO.promotion.Name + ' on Product: ' + orderItem.Product2Id__c;
         adjustments.add(adjustment);
         }
@@ -49,16 +50,16 @@ public with sharing class ItemLevelPromotionHandler implements IPromotionLevelHa
 
         // for (Order_item__c orderItem : orderItems) {
         //     if (promotion.productId__c == orderItem.Product2Id__c) {
-        //         orderItem.AdjustmentsAmount__c = orderItem.total_price__c - discount;
+        //         orderItem.AdjustmentsAmount__c = orderItem.Total_price__c - discount;
         //         totalDiscount += discount;
         //         updatedItems.add(orderItem);
         //     }
         // }
 
-        List<Order_item__c> matchingItems = adjustmentDTO.orderItemsByProductId.get(promotion.productId__c);
+        List<Order_item__c> matchingItems = adjustmentDTO.orderItemsByProductId.get(promotion.ProductId__c);
         if (matchingItems != null) {
          for (Order_item__c orderItem : matchingItems) {
-            orderItem.AdjustmentsAmount__c = orderItem.total_price__c - discount;
+            orderItem.AdjustmentsAmount__c = orderItem.Total_price__c - discount;
             totalDiscount += discount;
             updatedItems.add(orderItem);
          }

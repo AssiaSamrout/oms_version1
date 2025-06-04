@@ -50,11 +50,11 @@ public with sharing class ItemLevelPromotionHandlerTest {
             Name='Item level promo with min amount',
             RecordTypeId = rt.Id,
             MinAmount__c = null,
-            activeFrom__c = Date.Today(),
-            activeTo__c = Date.Today().addDays(30),
-            isAutomatic__c = true,
-            usageLimit__c = 10,
-            usageCount__c = 0,
+            ActiveFrom__c = Date.Today(),
+            ActiveTo__c = Date.Today().addDays(30),
+            IsAutomatic__c = true,
+            UsageLimit__c = 10,
+            UsageCount__c = 0,
             Type__c= 'Percentage',
             Percentage__c = 10.0,
             DiscountValue__c = null,
@@ -63,7 +63,7 @@ public with sharing class ItemLevelPromotionHandlerTest {
         );
         insert promotion;
         List<Promotion__c> queriedPromotions = [
-        SELECT Id, Name, RecordTypeId, RecordType.Name, MinAmount__c, isAutomatic__c,Percentage__c, Type__c,usageLimit__c, usageCount__c,DiscountValue__c,
+        SELECT Id, Name, RecordTypeId, RecordType.Name, MinAmount__c, IsAutomatic__c,Percentage__c, Type__c,UsageLimit__c, UsageCount__c,DiscountValue__c,
                productId__c, Description__c
         FROM Promotion__c
         WHERE Id = :promotion.Id

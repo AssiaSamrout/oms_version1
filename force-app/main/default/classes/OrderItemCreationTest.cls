@@ -8,15 +8,16 @@ public with sharing class OrderItemCreationTest {
         insert acc;
         Order__c order = new Order__c();
         order.AccountId__c = acc.Id;  
-        order.status__c = 'Draft';
-        order.billing_street__c = '123 Main St';
-        order.billing_city__c = 'San Francisco';
-        order.billing_country__c = 'USA';
-        order.billing_email__c = 'dkdcmkdkd@gmail.com';
-        order.order_amount__c = 1000.00;
+        order.Status__c = 'Draft';
+        order.Billing_street__c = '123 Main St';
+        order.Billing_city__c = 'San Francisco';
+        order.Billing_country__c = 'USA';
+        order.Billing_email__c = 'dkdcmkdkd@gmail.com';
+        order.Order_amount__c = 1000.00;
+        order.SubTotal__c = 1000.00;
         order.PO_number__c = 'PO123456';
         order.PO_date__c = Date.today();
-        order.order_start_date__c = Date.today();
+        order.Order_start_date__c = Date.today();
         insert order;
 
         List<Product2> products = new List<Product2>();
@@ -50,15 +51,15 @@ public with sharing class OrderItemCreationTest {
         Test.startTest();
         OrderItemService.InsertResult result= OrderItemService.insertOrderItems(items, orderId);
         Test.stopTest();
-        List<Order_item__c> orderItems = [SELECT Id, Product2Id__c, Name, quantity__c, unit_price__c, total_price__c, description__c FROM Order_item__c WHERE orderId__c = :orderId];
+        List<Order_item__c> orderItems = [SELECT Id, Product2Id__c, Name, Quantity__c, Unit_price__c, Total_price__c, Description__c FROM Order_item__c WHERE OrderId__c = :orderId];
         System.assertEquals(3, orderItems.size(), 'Order items count should be 5');
         for(Order_item__c orderItem : orderItems){
             System.assertNotEquals(null, orderItem.Product2Id__c, 'Product2Id should not be null');
             System.assertNotEquals(null, orderItem.Name, 'Name should not be null');
-            System.assertNotEquals(null, orderItem.quantity__c, 'Quantity should not be null');
-            System.assertNotEquals(null, orderItem.unit_price__c, 'Unit Price should not be null');
-            System.assertNotEquals(null, orderItem.total_price__c, 'Total Price should not be null');
-            System.assertNotEquals(null, orderItem.description__c, 'Description should not be null');
+            System.assertNotEquals(null, orderItem.Quantity__c, 'Quantity should not be null');
+            System.assertNotEquals(null, orderItem.Unit_price__c, 'Unit Price should not be null');
+            System.assertNotEquals(null, orderItem.Total_price__c, 'Total Price should not be null');
+            System.assertNotEquals(null, orderItem.Description__c, 'Description should not be null');
         }
 
         System.assertEquals(3, result.successfulItems.size(), 'Successful items count should be 5');

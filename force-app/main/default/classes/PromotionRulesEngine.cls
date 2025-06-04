@@ -4,7 +4,7 @@ public with sharing class PromotionRulesEngine {
         * It retrieves the rules from custom metadata and applies them to the order and its items.
         * the retrieved rules are fetched based on the promotion's record type.(order level or item level)
     */
-    public static PromotionEligibilityResult isEligible(Order__c order,Map<Id,List<order_item__c>> orderItemsByProduct, promotion__c promotion) {
+    public static PromotionEligibilityResult isEligible(Order__c order,Map<Id,List<Order_item__c>> orderItemsByProduct, Promotion__c promotion) {
        
         PromotionEligibilityResult result = new PromotionEligibilityResult(true);
         System.debug('inside promotionengine first log');
@@ -15,7 +15,7 @@ public with sharing class PromotionRulesEngine {
             throw new IllegalArgumentException('Order, OrderItems and Promotion cannot be null');
         }
 
-        if(!Schema.SObjectType.promotion__c.isAccessible()) {
+        if(!Schema.SObjectType.Promotion__c.isAccessible()) {
             throw new SecurityException('Promotion object not accessible');
         }
         try{
@@ -55,7 +55,7 @@ public with sharing class PromotionRulesEngine {
         * @return A list of active PromotionEligibilityRules__mdt records applicable to the promotion.
     */
 
-    public static List<PromotionEligibilityRules__mdt> getAllRules(promotion__c promotion){
+    public static List<PromotionEligibilityRules__mdt> getAllRules(Promotion__c promotion){
         if(!Schema.SObjectType.PromotionEligibilityRules__mdt.isAccessible()) {
             throw new SecurityException('Promotion Eligibility Rules object not accessible');
         }
