@@ -26,9 +26,8 @@ public with sharing class PromotionRulesEngine {
             System.debug('inside the loop');
             IPromotionRule ruleInstance = PromotionRuleCacheHelper.getRuleInstance(promorule.ClassName__c);
             if(ruleInstance == null) {
-                result.isEligible = false;
-                result.failureReasons.add('Class not found: ' + promorule.ClassName__c);
-                continue; // Skip this rule, continue checking others
+                System.debug('Class not found inside PromotionRulesEngine: ' + promorule.ClassName__c);
+                throw new PromoException('Class not found: ' + promorule.ClassName__c); 
             }
             System.debug('rule class instance:'+ruleInstance);
             if(!ruleInstance.isEligible(order, orderItemsByProduct, promotion)){
