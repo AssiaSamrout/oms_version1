@@ -1,4 +1,4 @@
-@RestResource(urlMapping='/order/*')
+@RestResource(urlMapping='/order/create')
 global with sharing class OrderController {
     /*
      * This class handles the creation of orders via a REST API endpoint.

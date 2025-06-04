@@ -60,8 +60,17 @@ public with sharing class PromotionService {
             SELECT Id, Name, Percentage__c, RecordTypeId, RecordType.Name, DiscountValue__c, 
                    IsAutomatic__c, Type__c, ActiveFrom__c, ActiveTo__c,Description__c,MinAmount__c
             FROM Promotion__c
-            WHERE Id IN :promotionIds OR /*add isactive condition */
-            (IsAutomatic__c = true AND ActiveFrom__c <= :Date.today() AND (ActiveTo__c >= :Date.today() OR ActiveTo__c = null))
+            WHERE (
+                   Id IN :promotionIds
+                   AND ActiveFrom__c <= :Date.today()
+                   AND (ActiveTo__c >= :Date.today() OR ActiveTo__c = null)
+                   )
+                 OR 
+                  (
+                   IsAutomatic__c = true
+                   AND ActiveFrom__c <= :Date.today()
+                   AND (ActiveTo__c >= :Date.today() OR ActiveTo__c = null)
+                  )
         ];
     }
 
