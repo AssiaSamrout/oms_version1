@@ -115,30 +115,36 @@ public with sharing class PostCheckoutProcessor {
         List<Order_adjustment__c> allAdjustments = new List<Order_adjustment__c>();
         List<Coupon__c> couponsToUpdate = new List<Coupon__c>();
         System.debug('inside processPromotions before the loop');
-        
+        AdjustmentDTO adjustmentDTO = new AdjustmentDTO();
+        Integer counter = 0;
         for (Promotion__c promo : dto.promotions) {
-        if (!processSinglePromotion(promo, handler, dto, allAdjustments, couponsToUpdate, checkoutResult)) {
+            counter++;
+            adjustmentDTO.order = dto.order;
+            adjustmentDTO.orderItems = dto.orderItems;
+            adjustmentDTO.promotion = promo;
+            adjustmentDTO.coupon = dto.promoToCoupon.get(promo.Id);
+        if (!processSinglePromotion(handler, adjustmentDTO, checkoutResult)) {
+            if(promo.IsAutomatic__c) {
+                System.debug('Skipping automatic promotion: ' + promo.Name);
+                continue; // Skip automatic promotions if not eligible
+            }
             return checkoutResult; 
         }
+        System.debug('PROCESSING PROMOTION: ' + promo.Name + ', COUNTER: ' + counter);
 
+        allAdjustments.addAll(createAdjustments(adjustmentDTO, checkoutResult, handler));
+        System.debug('Adjustments created for promotion: ' + promo.Name + ', Adjustments: ' + allAdjustments);
+        couponsToUpdate.addAll(applySideEffects(adjustmentDTO, checkoutResult, handler));
     }
         System.debug('inisde processPromotions after the loop, before DML operations'+ ' couponsToUpdate: ' + couponsToUpdate + ', allAdjustments: ' + allAdjustments);
+        // Update coupons and adjustments
         if (!couponsToUpdate.isEmpty() || !allAdjustments.isEmpty()) {
-            try {
-                if (!couponsToUpdate.isEmpty()) {
-                    System.debug('Updating coupons: ' + couponsToUpdate);
-                    update couponsToUpdate;
-                }
-                if (!allAdjustments.isEmpty()){ 
-                    insert allAdjustments;
-                }
-            } catch (DmlException e) {
-                System.debug('Error updating coupons/adjustments: ' + e.getMessage());
-                throw new DmlException('Insertion failed in post checkout: ' + e.getMessage());
-            }
+            updateCouponsAndAdjustments(couponsToUpdate, allAdjustments);
         }
         System.debug('Promotions processed successfully for type: ' + dto.promotionType);
-        
+        checkoutResult.isValid = true;
+        checkoutResult.failureReasons = new List<String>();
+        checkoutResult.statusCode = 200;
         checkoutResult.successMessage = 'Promotions processed successfully for type: ' + dto.promotionType;
         return checkoutResult;
         
@@ -157,38 +163,26 @@ public with sharing class PostCheckoutProcessor {
     * @return Boolean indicating whether the promotion was processed successfully.
 */
     private static Boolean processSinglePromotion(
-    Promotion__c promo, 
     IPromotionLevelHandler handler, 
-    ProcessPromotionsDTO dto, 
-    List<Order_adjustment__c> allAdjustments, 
-    List<Coupon__c> couponsToUpdate, 
+    AdjustmentDTO adjustmentDTO,
     PromotionsCheckoutResult checkoutResult
 ) {
-    AdjustmentDTO adjustmentDTO = new AdjustmentDTO(dto.order, dto.orderItems, promo, dto.promoToCoupon.get(promo.Id));
+    
     try {
         PromotionEligibilityResult result = handler.evaluateEligibility(adjustmentDTO);
         if (!result.isEligible) {
             checkoutResult.isValid = false;
             checkoutResult.failureReasons = result.failureReasons;
             checkoutResult.successMessage = null;
+            checkoutResult.statusCode = 422;
             return false;
         }
 
-        List<Order_adjustment__c> adjustments = handler.getAdjustments(adjustmentDTO);
-        if (!adjustments.isEmpty()) {
-            allAdjustments.addAll(adjustments);
-        }
-        handler.applySideEffects(adjustmentDTO);
-
-        if (adjustmentDTO.coupon != null) {
-            adjustmentDTO.coupon.UsageCount__c = (adjustmentDTO.coupon.UsageCount__c ?? 0) + 1;
-            couponsToUpdate.add(adjustmentDTO.coupon);
-        }
     } catch(PromoException e){
-            System.debug('Promotion processing failed for ' + promo.Name + ': ' + e.getMessage()+ 'Trace: ' + e.getStackTraceString());
+            System.debug('Promotion processing failed for ' + adjustmentDTO.promotion.Name + ': ' + e.getMessage()+ 'Trace: ' + e.getStackTraceString());
             checkoutResult.isValid = false;
             checkoutResult.failureReasons.add('Unexpected error during promotion');
-            checkoutResult.failureReasons.add('Promotion processing failed for ' + promo.Name + ': ' + e.getMessage());
+            checkoutResult.failureReasons.add('Promotion processing failed for ' + adjustmentDTO.promotion.Name + ': ' + e.getMessage());
             checkoutResult.successMessage = null;
             return false;
         } catch (Exception e) {
@@ -200,6 +194,74 @@ public with sharing class PostCheckoutProcessor {
         }
     return true;
 }
+
+    private static List<Order_adjustment__c> createAdjustments(
+        AdjustmentDTO adjustmentDTO,
+        PromotionsCheckoutResult checkoutResult,
+        IPromotionLevelHandler handler
+        ){
+            List<Order_adjustment__c> allAdjustments = new List<Order_adjustment__c>();
+            try{
+            List<Order_adjustment__c> adjustments = handler.getAdjustments(adjustmentDTO);
+            if (!adjustments.isEmpty()) {
+                allAdjustments.addAll(adjustments);
+            }
+            }catch (Exception e) {
+                System.debug('Unexpected error inside PostCheckoutProcessor.createAdjustments: ' + e.getMessage() + ' Trace: ' + e.getStackTraceString());
+                checkoutResult.isValid = false;
+                checkoutResult.failureReasons.add('Unexpected error during promotion processing: ' + e.getMessage());
+                checkoutResult.successMessage = null;
+                return new List<Order_adjustment__c>();
+            }
+            return allAdjustments;
+    }
+
+    private static List<Coupon__c> applySideEffects(
+        AdjustmentDTO adjustmentDTO,
+        PromotionsCheckoutResult checkoutResult,
+        IPromotionLevelHandler handler
+    ){
+        List<Coupon__c> couponsToUpdate = new List<Coupon__c>();
+        try{
+        handler.applySideEffects(adjustmentDTO);
+
+        if (adjustmentDTO.coupon != null) {
+            adjustmentDTO.coupon.UsageCount__c = (adjustmentDTO.coupon.UsageCount__c ?? 0) + 1;
+            couponsToUpdate.add(adjustmentDTO.coupon);
+        }
+    }catch(Exception e){
+        System.debug('Unexpected error inside PostCheckoutProcessor.applySideEffects: ' + e.getMessage() + ' Trace: ' + e.getStackTraceString());
+                checkoutResult.isValid = false;
+                checkoutResult.failureReasons.add('Unexpected error during promotion processing: ' + e.getMessage());
+                checkoutResult.successMessage = null;
+                return new List<Coupon__c>();
+    }
+        return couponsToUpdate;
+    }
+
+    private static void updateCouponsAndAdjustments(List<Coupon__c> couponsToUpdate, List<Order_adjustment__c> allAdjustments) {
+        if (!couponsToUpdate.isEmpty()) {
+            try {
+                System.debug('Updating coupons: ' + couponsToUpdate);
+                update couponsToUpdate;
+            } catch (DmlException e) {
+                System.debug('Error updating coupons: ' + e.getMessage());
+                throw new DmlException('Error updating coupons: ' + e.getMessage());
+            }
+        }
+
+        if (!allAdjustments.isEmpty()) {
+            try {
+                System.debug('Inserting adjustments: ' + allAdjustments);
+                insert allAdjustments;
+            } catch (DmlException e) {
+                System.debug('Error inserting adjustments: ' + e.getMessage());
+                throw new DmlException('Error inserting adjustments: ' + e.getMessage());
+            }
+        }
+    }
+
+    
 
 
    /*
