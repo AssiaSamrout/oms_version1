@@ -41,6 +41,8 @@ public with sharing class PostCheckoutProcessor {
         // Split promotions by level
         Map<String, List<Promotion__c>> promoMap = splitPromotionsByLevel(promotions);
         PromotionsCheckoutResult checkoutResult;
+
+        if(!promoMap.get('order_level').isEmpty()){
         // Process each type of promotion
         ProcessPromotionsDTO processDTO = new ProcessPromotionsDTO();
         processDTO.order = order;
@@ -50,11 +52,13 @@ public with sharing class PostCheckoutProcessor {
         processDTO.promotionType = 'order_level';
         
         checkoutResult = processPromotions(processDTO);
-
+        
         if (!checkoutResult.isValid) {
             return checkoutResult;
         }
+    }
 
+        if(!promoMap.get('item_level').isEmpty()){
         ProcessPromotionsDTO itemLevelDTO = new ProcessPromotionsDTO();
         itemLevelDTO.order = order;
         itemLevelDTO.orderItems = orderItems;
@@ -63,9 +67,11 @@ public with sharing class PostCheckoutProcessor {
         itemLevelDTO.promotionType = 'item_level';
 
         checkoutResult= processPromotions(itemLevelDTO);
+       
         if (!checkoutResult.isValid) {
             return checkoutResult;
         } 
+    }
 
         // Recalculate and update order
         order.NetTotal__c = OrderService.adjustTotalAmount(
@@ -114,8 +120,9 @@ public with sharing class PostCheckoutProcessor {
         if (!processSinglePromotion(promo, handler, dto, allAdjustments, couponsToUpdate, checkoutResult)) {
             return checkoutResult; 
         }
-    }
 
+    }
+        System.debug('inisde processPromotions after the loop, before DML operations'+ ' couponsToUpdate: ' + couponsToUpdate + ', allAdjustments: ' + allAdjustments);
         if (!couponsToUpdate.isEmpty() || !allAdjustments.isEmpty()) {
             try {
                 if (!couponsToUpdate.isEmpty()) {

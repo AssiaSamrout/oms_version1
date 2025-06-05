@@ -50,7 +50,7 @@ public with sharing class TestsSetUp {
 
         RecordType rt = [SELECT Id FROM RecordType WHERE SObjectType='Promotion__c' AND Name = 'order_level' LIMIT 1];
         Promotion__c promotion1 = new Promotion__c (
-            Name='Order level promo with min amount',
+            Name='Order level promo without min amount',
             RecordTypeId = rt.Id,
             MinAmount__c = null,
             ActiveFrom__c = Date.Today(),
@@ -80,6 +80,23 @@ public with sharing class TestsSetUp {
             Description__c = 'description of promotion 2'
         );
         promotions.add(promotion2);
+
+        Promotion__c promotion3 = new Promotion__c (
+            Name='Order level promo with min amount promotion 3',
+            RecordTypeId = rt.Id,
+            MinAmount__c = 300.0,
+            ActiveFrom__c = Date.Today(),
+            ActiveTo__c = Date.Today().addDays(30),
+            IsAutomatic__c = true,
+            UsageLimit__c = 10,
+            UsageCount__c = 0,
+            Type__c= 'Percentage',
+            Percentage__c = 10.0,
+            DiscountValue__c = null,
+            Description__c = 'description of promotion 1'
+        );
+        promotions.add(promotion3);
+        
         
         insert promotions;
         List<Promotion__c> queriedPromotions = [

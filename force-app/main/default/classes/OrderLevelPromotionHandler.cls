@@ -27,6 +27,8 @@ public with sharing class OrderLevelPromotionHandler implements IPromotionLevelH
         adjustment.RecordTypeId = orderLevelRT;
         adjustment.Description__c = 'Order Level Promotion: ' + adjustmentDTO.promotion.Name;
 
+        System.debug('Order Level Adjustment inside getAdjustments orderlevel handler class: ' + adjustment);
+
         return new List<Order_adjustment__c> { adjustment };
     }
 
@@ -36,5 +38,7 @@ public with sharing class OrderLevelPromotionHandler implements IPromotionLevelH
             (adjustmentDTO.order.Total_order_adjustments__c != null 
             ? adjustmentDTO.order.Total_order_adjustments__c 
             : 0) + discount;
+
+            System.debug('Total order adjustments after applying side effects: ' + adjustmentDTO.order.Total_order_adjustments__c);
     }
 }

@@ -31,6 +31,11 @@ public with sharing class PromotionRulesEngine {
             }
             System.debug('rule class instance:'+ruleInstance);
             if(!ruleInstance.isEligible(order, orderItemsByProduct, promotion)){
+                //here is the bug 
+                if(promotion.IsAutomatic__c){
+                    System.debug('Promotion is automatic, skipping eligibility check for: ' + promorule.RuleName__c);
+                    continue; // Skip this rule if the promotion is automatic
+                }
                 result.isEligible = false;
                 result.failureReasons.add(promorule.RuleName__c + ' is not applicable on this order');
 
