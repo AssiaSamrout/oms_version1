@@ -123,7 +123,7 @@ public with sharing class PostCheckoutProcessor {
             adjustmentDTO.orderItems = dto.orderItems;
             adjustmentDTO.promotion = promo;
             adjustmentDTO.coupon = dto.promoToCoupon.get(promo.Id);
-        if (!processSinglePromotion(handler, adjustmentDTO, checkoutResult)) {
+        if (!PromotionProcessor.processSinglePromotion(handler, adjustmentDTO, checkoutResult)) {
             if(promo.IsAutomatic__c) {
                 System.debug('Skipping automatic promotion: ' + promo.Name);
                 continue; // Skip automatic promotions if not eligible
@@ -132,14 +132,14 @@ public with sharing class PostCheckoutProcessor {
         }
         System.debug('PROCESSING PROMOTION: ' + promo.Name + ', COUNTER: ' + counter);
 
-        allAdjustments.addAll(createAdjustments(adjustmentDTO, checkoutResult, handler));
+        allAdjustments.addAll(PromotionProcessor.createAdjustments(adjustmentDTO, checkoutResult, handler));
         System.debug('Adjustments created for promotion: ' + promo.Name + ', Adjustments: ' + allAdjustments);
-        couponsToUpdate.addAll(applySideEffects(adjustmentDTO, checkoutResult, handler));
+        couponsToUpdate.addAll(PromotionProcessor.applySideEffects(adjustmentDTO, checkoutResult, handler));
     }
         System.debug('inisde processPromotions after the loop, before DML operations'+ ' couponsToUpdate: ' + couponsToUpdate + ', allAdjustments: ' + allAdjustments);
         // Update coupons and adjustments
         if (!couponsToUpdate.isEmpty() || !allAdjustments.isEmpty()) {
-            updateCouponsAndAdjustments(couponsToUpdate, allAdjustments);
+            PromotionProcessor.updateCouponsAndAdjustments(couponsToUpdate, allAdjustments);
         }
         System.debug('Promotions processed successfully for type: ' + dto.promotionType);
         checkoutResult.isValid = true;
@@ -149,120 +149,6 @@ public with sharing class PostCheckoutProcessor {
         return checkoutResult;
         
     }
-
-/*
-    * Processes a single promotion and applies its effects to the order.
-    * helper method for processPromotions.
-
-    * @param promo The promotion to process.
-    * @param handler The handler for the promotion level.
-    * @param dto The DTO containing order and items.
-    * @param allAdjustments List to collect all adjustments made by promotions.
-    * @param couponsToUpdate List to collect coupons that need to be updated.
-    * @param checkoutResult The result object to update with success or failure.
-    * @return Boolean indicating whether the promotion was processed successfully.
-*/
-    private static Boolean processSinglePromotion(
-    IPromotionLevelHandler handler, 
-    AdjustmentDTO adjustmentDTO,
-    PromotionsCheckoutResult checkoutResult
-) {
-    
-    try {
-        PromotionEligibilityResult result = handler.evaluateEligibility(adjustmentDTO);
-        if (!result.isEligible) {
-            checkoutResult.isValid = false;
-            checkoutResult.failureReasons = result.failureReasons;
-            checkoutResult.successMessage = null;
-            checkoutResult.statusCode = 422;
-            return false;
-        }
-
-    } catch(PromoException e){
-            System.debug('Promotion processing failed for ' + adjustmentDTO.promotion.Name + ': ' + e.getMessage()+ 'Trace: ' + e.getStackTraceString());
-            checkoutResult.isValid = false;
-            checkoutResult.failureReasons.add('Unexpected error during promotion');
-            checkoutResult.failureReasons.add('Promotion processing failed for ' + adjustmentDTO.promotion.Name + ': ' + e.getMessage());
-            checkoutResult.successMessage = null;
-            return false;
-        } catch (Exception e) {
-            System.debug('Unexpected error during promotion processing: ' + e.getMessage() + ' Trace: ' + e.getStackTraceString());
-            checkoutResult.isValid = false;
-            checkoutResult.failureReasons.add('Unexpected error during promotion processing: ' + e.getMessage());
-            checkoutResult.successMessage = null;
-            return false;
-        }
-    return true;
-}
-
-    private static List<Order_adjustment__c> createAdjustments(
-        AdjustmentDTO adjustmentDTO,
-        PromotionsCheckoutResult checkoutResult,
-        IPromotionLevelHandler handler
-        ){
-            List<Order_adjustment__c> allAdjustments = new List<Order_adjustment__c>();
-            try{
-            List<Order_adjustment__c> adjustments = handler.getAdjustments(adjustmentDTO);
-            if (!adjustments.isEmpty()) {
-                allAdjustments.addAll(adjustments);
-            }
-            }catch (Exception e) {
-                System.debug('Unexpected error inside PostCheckoutProcessor.createAdjustments: ' + e.getMessage() + ' Trace: ' + e.getStackTraceString());
-                checkoutResult.isValid = false;
-                checkoutResult.failureReasons.add('Unexpected error during promotion processing: ' + e.getMessage());
-                checkoutResult.successMessage = null;
-                return new List<Order_adjustment__c>();
-            }
-            return allAdjustments;
-    }
-
-    private static List<Coupon__c> applySideEffects(
-        AdjustmentDTO adjustmentDTO,
-        PromotionsCheckoutResult checkoutResult,
-        IPromotionLevelHandler handler
-    ){
-        List<Coupon__c> couponsToUpdate = new List<Coupon__c>();
-        try{
-        handler.applySideEffects(adjustmentDTO);
-
-        if (adjustmentDTO.coupon != null) {
-            adjustmentDTO.coupon.UsageCount__c = (adjustmentDTO.coupon.UsageCount__c ?? 0) + 1;
-            couponsToUpdate.add(adjustmentDTO.coupon);
-        }
-    }catch(Exception e){
-        System.debug('Unexpected error inside PostCheckoutProcessor.applySideEffects: ' + e.getMessage() + ' Trace: ' + e.getStackTraceString());
-                checkoutResult.isValid = false;
-                checkoutResult.failureReasons.add('Unexpected error during promotion processing: ' + e.getMessage());
-                checkoutResult.successMessage = null;
-                return new List<Coupon__c>();
-    }
-        return couponsToUpdate;
-    }
-
-    private static void updateCouponsAndAdjustments(List<Coupon__c> couponsToUpdate, List<Order_adjustment__c> allAdjustments) {
-        if (!couponsToUpdate.isEmpty()) {
-            try {
-                System.debug('Updating coupons: ' + couponsToUpdate);
-                update couponsToUpdate;
-            } catch (DmlException e) {
-                System.debug('Error updating coupons: ' + e.getMessage());
-                throw new DmlException('Error updating coupons: ' + e.getMessage());
-            }
-        }
-
-        if (!allAdjustments.isEmpty()) {
-            try {
-                System.debug('Inserting adjustments: ' + allAdjustments);
-                insert allAdjustments;
-            } catch (DmlException e) {
-                System.debug('Error inserting adjustments: ' + e.getMessage());
-                throw new DmlException('Error inserting adjustments: ' + e.getMessage());
-            }
-        }
-    }
-
-    
-
 
    /*
         * Validates the coupons to ensure they are valid and applicable.
@@ -306,7 +192,7 @@ public with sharing class PostCheckoutProcessor {
         * @param promotions The list of promotions to split.
         * @return A map where the key is the promotion level ('order_level' or 'item_level') and the value is a list of promotions for that level.
     */
-
+    //done creating a class for it
     private static Map<String, List<Promotion__c>> splitPromotionsByLevel(List<Promotion__c> promotions) {
         Map<String, List<Promotion__c>> result = new Map<String, List<Promotion__c>>{
             'order_level' => new List<Promotion__c>(),
@@ -325,3 +211,4 @@ public with sharing class PostCheckoutProcessor {
     }
 
 }
+
