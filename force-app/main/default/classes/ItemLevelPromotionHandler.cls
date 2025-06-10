@@ -4,7 +4,13 @@ public with sharing class ItemLevelPromotionHandler implements IPromotionLevelHa
      * It evaluates eligibility, calculates discounts, and applies adjustments at the item level.
      */
     public PromotionEligibilityResult evaluateEligibility(AdjustmentDTO adjustmentDTO){
-        return PromotionService.isEligible(adjustmentDTO.order, adjustmentDTO.orderItemsByProductId, adjustmentDTO.promotion);
+        CartDTO cartDTO = new CartDTO();
+        cartDTO.totalAmount = adjustmentDTO.order.SubTotal__c;
+        cartDTO.couponCode = new List<String>();
+        cartDTO.couponCode.add(adjustmentDTO.coupon != null ? adjustmentDTO.coupon.Code__c : null);
+        cartDTO.items=OrderItemService.convertOrderItemsToDTO(adjustmentDTO.orderItems);
+        return PromotionService.isEligible(cartDTO, adjustmentDTO.itemsByProductId, adjustmentDTO.promotion);
+       // return PromotionService.isEligible(adjustmentDTO.order, adjustmentDTO.orderItemsByProductId, adjustmentDTO.promotion);
     }
 
     public Decimal calculateDiscount(AdjustmentDTO adjustmentDTO){

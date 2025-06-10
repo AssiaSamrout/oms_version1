@@ -44,6 +44,8 @@ public with sharing class OrderItemCreationTest {
             item.unitPrice = 100.00;
             item.totalPrice = 100.00;
             item.description = 'Test Description';
+            item.size = 'M';
+            item.color = 'Red';
             items.add(item);
         }
 
@@ -77,6 +79,8 @@ public with sharing class OrderItemCreationTest {
         item.unitPrice = null;
         item.totalPrice = 100.00;
         item.description = 'Test Description';
+        item.size = 'M';
+        item.color = 'Red';
         items.add(item);
         Id orderId = [Select Id from Order__c limit 1].Id;
         Test.startTest();
@@ -97,6 +101,8 @@ public with sharing class OrderItemCreationTest {
         item.unitPrice = 100.00;
         item.totalPrice = 100.00;
         item.description = 'Test Description';
+        item.size = 'M';
+        item.color = 'Red';
         items.add(item);
         Id orderId = [Select Id from Order__c limit 1].Id;
         Test.startTest();
@@ -119,6 +125,8 @@ public with sharing class OrderItemCreationTest {
         item.unitPrice = 100.00;
         item.totalPrice = 100.00;
         item.description = 'Test Description';
+        item.size = 'M';
+        item.color = 'Red';
 
         Id orderId = [Select Id from Order__c limit 1].Id;
 

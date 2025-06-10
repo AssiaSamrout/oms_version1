@@ -77,7 +77,9 @@ public with sharing class OrderItemService {
                 Quantity__c = item.quantity,
                 Unit_price__c = item.unitPrice,
                 Total_price__c = item.totalPrice,
-                Description__c = item.description
+                Description__c = item.description,
+                Size__c = item.size,
+                Color__c = item.color
             );
             orderItems.add(oi);
         }
@@ -111,6 +113,23 @@ public with sharing class OrderItemService {
             throw new IllegalArgumentException('Quantity and Unit Price cannot be null');
         }
         return quantity * unitPrice;
+    }
+
+    public static List<ItemDTO> convertOrderItemsToDTO(List<Order_item__c> orderitems){
+        List<ItemDTO> itemDTOs = new List<ItemDTO>();
+        for (Order_item__c orderItem : orderitems) {
+            ItemDTO itemDTO = new ItemDTO();
+            itemDTO.productId = orderItem.Product2Id__c;
+            itemDTO.productName = orderItem.Name;
+            itemDTO.quantity = orderItem.Quantity__c;
+            itemDTO.unitPrice = orderItem.Unit_price__c;
+            itemDTO.totalPrice = orderItem.Total_price__c;
+            itemDTO.description = orderItem.Description__c;
+            itemDTO.size = orderItem.Size__c;
+            itemDTO.color = orderItem.Color__c;
+            itemDTOs.add(itemDTO);
+        }
+        return itemDTOs;
     }
 
 }

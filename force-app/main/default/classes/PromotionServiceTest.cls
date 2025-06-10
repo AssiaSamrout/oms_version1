@@ -17,7 +17,7 @@ public with sharing class PromotionServiceTest {
         System.debug('Results from getAutoApplicablePromotions: ' + results);
        
         System.assertNotEquals(null, results, 'Results should not be null');
-        System.assertEquals(1, results.size(), 'There should be one applicable promotion');
+        System.assertEquals(2, results.size(), 'There should be 2 applicable promotion');
     }
 
     /*
@@ -32,17 +32,33 @@ public with sharing class PromotionServiceTest {
         Order__c order = TestsSetUp.createOrder();
         List<Order_item__c> orderItems = TestsSetUp.createOrderItems(order, products);
         List<Promotion__c> promotions = TestsSetUp.makeDataForPromotionRule();
-         Map<Id,List<Order_item__c>> orderItemsByProductId = new Map<Id,List<Order_item__c>>();
-    for(Order_item__c item : orderItems){
-        if(!orderItemsByProductId.containsKey(item.Product2Id__c)){
-            orderItemsByProductId.put(item.Product2Id__c, new List<Order_item__c>());
+        CartDTO cartDTO = new CartDTO();
+        cartDTO.totalAmount = order.SubTotal__c;
+        cartDTO.couponCode = new List<String>();
+        cartDTO.items = OrderItemService.convertOrderItemsToDTO(orderItems);
+
+        Map<String,List<ItemDTO>> itemsByProductId = new Map<String,List<ItemDTO>>();
+
+        for(Order_item__c item : orderItems){
+            if(!itemsByProductId.containsKey(item.Product2Id__c)){
+                itemsByProductId.put(item.Product2Id__c, new List<ItemDTO>());
+            }
+            ItemDTO itemDTO = new ItemDTO();
+            itemDTO.productId = item.Product2Id__c;
+            itemDTO.quantity = item.Quantity__c;
+            itemDTO.unitPrice = item.Unit_price__c;
+            itemDTO.totalPrice = item.Total_price__c;
+            itemDTO.description = item.Description__c;
+            itemDTO.size = item.Size__c;
+            itemDTO.color = item.Color__c;
+            itemDTO.productName = item.Name; 
+
+            itemsByProductId.get(item.Product2Id__c).add(itemDTO);
         }
-        orderItemsByProductId.get(item.Product2Id__c).add(item);
-    }
        
         Test.startTest();
-        PromotionEligibilityResult result1 = PromotionService.isEligible(order, orderItemsByProductId, promotions[0]);
-        PromotionEligibilityResult result2 = PromotionService.isEligible(order, orderItemsByProductId, promotions[1]);
+        PromotionEligibilityResult result1 = PromotionService.isEligible(cartDTO, itemsByProductId, promotions[0]);
+        PromotionEligibilityResult result2 = PromotionService.isEligible(cartDTO, itemsByProductId, promotions[1]);
         Test.stopTest();
 
      

@@ -8,7 +8,7 @@ public with sharing class PromotionService {
 
         List<Promotion__c> promotions = [
             SELECT Id, Name, Percentage__c, RecordTypeId, RecordType.Name, DiscountValue__c, 
-                   IsAutomatic__c, Type__c, ActiveFrom__c, ActiveTo__c,	productId__c,Description__c
+                   IsAutomatic__c, Type__c, ActiveFrom__c, ActiveTo__c,Description__c,MinAmount__c
             FROM Promotion__c
             WHERE Id = :promotionId
             LIMIT 1
@@ -82,7 +82,7 @@ public with sharing class PromotionService {
         * @param promotion The promotion to check against the order.
         * @return A PromotionEligibilityResult indicating whether the order is eligible and any failure reasons.
     */
-    public static PromotionEligibilityResult isEligible(Order__c order, Map<Id,List<Order_item__c>> orderItemsByProduct, Promotion__c promotion){
+    public static PromotionEligibilityResult isEligible(CartDTO cartDTO, Map<String,List<ItemDTO>> itemsByProductId,Promotion__c promotion){
         //check the rule of the promotion if it is applicable on this order using rule 
             // Promotion__c promotion = [
             // SELECT Id, Name, Percentage__c,RecordTypeId, RecordType.Name,DiscountValue__c, IsAutomatic__c, Type__c, ActiveFrom__c, activeTo__C
@@ -92,11 +92,11 @@ public with sharing class PromotionService {
 
             //we should make sure that promotion has recordType.name field value(this field does not get retrieved when the promotion is inserted)
         System.debug('inside is promotion applicable');
-        if(order == null || orderItemsByProduct == null || promotion ==null){
+        if(cartDTO == null || promotion ==null){
             throw new IllegalArgumentException('Order, OrderItems and Promotion cannot be null');
         }
 
-        return PromotionRulesEngine.isEligible(order, orderItemsByProduct, promotion);
+        return PromotionRulesEngine.isEligible(cartDTO,itemsByProductId, promotion);
     }
 
     /*

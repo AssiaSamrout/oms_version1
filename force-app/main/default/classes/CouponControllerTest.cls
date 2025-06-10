@@ -9,15 +9,15 @@ public with sharing class CouponControllerTest {
         List<Order_item__c> orderItems = TestsSetUp.createOrderItems(order, products);
 
         List<Promotion__c> promotions = TestsSetUp.makeDataForPromotionRule();
-        Promotion__c promoToUse = promotions[0];
+        Promotion__c promoToUse = promotions[1];
 
         Coupon__c coupon = TestsSetUp.createValidCoupon(promoToUse);
         Account account = [SELECT Id FROM Account WHERE Name= 'Test Account' LIMIT 1][0];
-        payload.put('subtotal', order.SubTotal__c);
+        payload.put('totalAmount', order.SubTotal__c+200.0);
         payload.put('accountId', account.Id); 
         payload.put('shippingMethod', 'Standard');
         payload.put('cartDate', Date.today());
-        payload.put('couponCode', coupon.Code__c);
+        payload.put('couponCode', new List<String>{ coupon.Code__c });
         payload.put('items', orderItems);
         return payload; 
     }
@@ -62,7 +62,7 @@ public with sharing class CouponControllerTest {
     @isTest
     public static void testCouponControllerInvalidPayload() {
         Map<String,Object> payload = mockCartPayload();
-        payload.put('couponCode', 'INVALID_CODE');
+        payload.put('couponCode', new List<String>{ 'INVALID_CODE' });
         RestContext.request = buildrestReq(JSON.serialize(payload));
         
         RestResponse res = new RestResponse(); 

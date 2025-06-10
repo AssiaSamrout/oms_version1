@@ -17,9 +17,9 @@ global class CouponController {
                 return;
             }
 
-            CartDTO cart;
+            CartWrapper cart;
             try {
-                cart = (CartDTO) JSON.deserialize(requestBody, CartDTO.class);
+                cart = (CartWrapper) JSON.deserialize(requestBody, CartWrapper.class);
             } catch (Exception e) {
                 res.statusCode = 400;
                 res.responseBody = Blob.valueOf(JSON.serialize(new Map<String, Object>{
@@ -29,7 +29,7 @@ global class CouponController {
                 return;
             }
 
-            if (cart == null || String.isBlank(cart.couponCode)) {
+            if (cart == null || cart.couponCode.isEmpty()) {
                 res.statusCode = 400;
                 res.responseBody = Blob.valueOf(JSON.serialize(new Map<String, Object>{
                     'error' => 'Coupon code cannot be null or empty',
@@ -37,13 +37,13 @@ global class CouponController {
                 }));
                 return;
             }
-
-            CouponValidationResult result = CouponValidationService.validateCouponCode(cart.couponCode);
+            
+            CouponValidationResult result = CouponValidationService.validateCouponCode(cart);
             if (!result.isValid) {
                 res.statusCode = 400;
                 res.responseBody = Blob.valueOf(JSON.serialize(new Map<String, Object>{
                     'isValid' => false,
-                    'error' => result.errorMessage
+                    'error' => String.join(result.errorMessages, ', ')
                 }));
                 return;
             }

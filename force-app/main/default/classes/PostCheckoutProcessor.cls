@@ -115,14 +115,12 @@ public with sharing class PostCheckoutProcessor {
         List<Order_adjustment__c> allAdjustments = new List<Order_adjustment__c>();
         List<Coupon__c> couponsToUpdate = new List<Coupon__c>();
         System.debug('inside processPromotions before the loop');
-        AdjustmentDTO adjustmentDTO = new AdjustmentDTO();
+        AdjustmentDTO adjustmentDTO;
         Integer counter = 0;
         for (Promotion__c promo : dto.promotions) {
             counter++;
-            adjustmentDTO.order = dto.order;
-            adjustmentDTO.orderItems = dto.orderItems;
-            adjustmentDTO.promotion = promo;
-            adjustmentDTO.coupon = dto.promoToCoupon.get(promo.Id);
+            adjustmentDTO = new AdjustmentDTO(dto.order, dto.orderItems, promo, dto.promoToCoupon.get(promo.Id));
+            
         if (!PromotionProcessor.processSinglePromotion(handler, adjustmentDTO, checkoutResult)) {
             if(promo.IsAutomatic__c) {
                 System.debug('Skipping automatic promotion: ' + promo.Name);

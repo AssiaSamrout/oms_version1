@@ -15,11 +15,11 @@ public with sharing class ItemLevelPromotionHandlerTest {
             coupon = null;
         }
 
-        AdjustmentDTO dto = new AdjustmentDTO();
-        dto.order = order;
+        AdjustmentDTO dto = new AdjustmentDTO(order, orderItems,promoToUse,withCoupon ? coupon : null);
+       /* dto.order = order;
         dto.orderItems = orderItems;
         dto.promotion = promoToUse;
-        dto.coupon = withCoupon ? coupon : null;
+        dto.coupon = withCoupon ? coupon : null;*/
 
         return dto;
     }
@@ -32,7 +32,7 @@ public with sharing class ItemLevelPromotionHandlerTest {
         Test.startTest();
         PromotionEligibilityResult promoEligibility = handler.evaluateEligibility(adjustmentDTO);
         Test.stopTest();
-
+		System.debug('INSIDE TEST ELIGIBLITY AND DISCOUNT TEST:'+promoEligibility);
         System.assertEquals(true, promoEligibility.isEligible, 'Promotion should be eligible');
         System.assertEquals(0, promoEligibility.failureReasons.size(), 'No failure reasons should be present');
     }

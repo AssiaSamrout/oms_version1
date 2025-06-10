@@ -8,5 +8,5 @@ public Interface IPromotionRule {
            * @param promotion The promotion to check against the order.
      */
    // Boolean isEligible(order__c order, List<order_item__c> orderItems, promotion__c promotion);
-    Boolean isEligible(Order__c order, Map<Id,List<Order_item__c>> orderItemsByProduct, Promotion__c promotion);
+    Boolean isEligible(CartDTO cartDTO ,Map<String,List<ItemDTO>> itemsByProductId,Promotion__c promotion);  
 }

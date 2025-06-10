@@ -1,10 +1,16 @@
-public with sharing class OrderLevelPromotionHandler implements IPromotionLevelHandler {
     /*
      * This class handles order-level promotions, which apply to the entire order rather than individual items.
      * It evaluates eligibility, calculates discounts, and applies adjustments at the order level.
      */
+public with sharing class OrderLevelPromotionHandler implements IPromotionLevelHandler {
     public PromotionEligibilityResult evaluateEligibility(AdjustmentDTO adjustmentDTO) {
-        return PromotionService.isEligible(adjustmentDTO.order, adjustmentDTO.orderItemsByProductId, adjustmentDTO.promotion);
+        CartDTO cartDTO = new CartDTO();
+        cartDTO.totalAmount = adjustmentDTO.order.SubTotal__c;
+        cartDTO.couponCode = new List<String>();
+        cartDTO.couponCode.add(adjustmentDTO.coupon != null ? adjustmentDTO.coupon.Code__c : null);
+        cartDTO.items=OrderItemService.convertOrderItemsToDTO(adjustmentDTO.orderItems);
+        return PromotionService.isEligible(cartDTO, adjustmentDTO.itemsByProductId, adjustmentDTO.promotion);
+        //return PromotionService.isEligible(adjustmentDTO.order, adjustmentDTO.orderItemsByProductId, adjustmentDTO.promotion);
     }
 
     public Decimal calculateDiscount(AdjustmentDTO adjustmentDTO) {

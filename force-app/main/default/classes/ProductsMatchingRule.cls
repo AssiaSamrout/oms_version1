@@ -10,18 +10,30 @@ public with sharing class ProductsMatchingRule implements IPromotionRule {
         * @param promotion The promotion to check against the order.
         * @return true if the order is eligible for the promotion, false otherwise.
     */
-    public Boolean isEligible(Order__c order, Map<Id,List<Order_item__c>> orderItemsByProduct, Promotion__c promotion) {
+    public Boolean isEligible(CartDTO cartDTO,Map<String,List<ItemDTO>> itemsByProductId, Promotion__c promotion) {
         if (promotion.productId__c == null) {
             return false;
         }
 
-        List<Order_item__c> items = orderItemsByProduct.get(promotion.productId__c);
+        List<ItemDTO> items = itemsByProductId.get(promotion.productId__c);
         if (items != null && !items.isEmpty()) {
             return true; 
         }
 
         return false;
     }
+    // public Boolean isEligible(Order__c order, Map<Id,List<Order_item__c>> orderItemsByProduct, Promotion__c promotion) {
+    //     if (promotion.productId__c == null) {
+    //         return false;
+    //     }
+
+    //     List<Order_item__c> items = orderItemsByProduct.get(promotion.productId__c);
+    //     if (items != null && !items.isEmpty()) {
+    //         return true; 
+    //     }
+
+    //     return false;
+    // }
 
 
     

@@ -13,12 +13,26 @@ public with sharing class RuleEngineTest {
     Order__c order = TestsSetUp.createOrder();
     List<Order_item__c> orderItems = TestsSetUp.createOrderItems(order, products);
     List<Promotion__c> promotions = TestsSetUp.makeDataForPromotionRule();
-    Map<Id,List<Order_item__c>> orderItemsByProductId = new Map<Id,List<Order_item__c>>();
+    CartDTO cartDTO = new CartDTO();
+    cartDTO.totalAmount = order.SubTotal__c;
+    cartDTO.couponCode = new List<String>();
+    cartDTO.items = OrderItemService.convertOrderItemsToDTO(orderItems);
+    Map<String,List<ItemDTO>> itemsByProductId = new Map<String,List<ItemDTO>>();
     for(Order_item__c item : orderItems){
-        if(!orderItemsByProductId.containsKey(item.Product2Id__c)){
-            orderItemsByProductId.put(item.Product2Id__c, new List<Order_item__c>());
+        if(!itemsByProductId.containsKey(item.Product2Id__c)){
+            itemsByProductId.put(item.Product2Id__c, new List<ItemDTO>());
         }
-        orderItemsByProductId.get(item.Product2Id__c).add(item);
+        ItemDTO itemDTO = new ItemDTO();
+        itemDTO.productId = item.Product2Id__c;
+        itemDTO.quantity = item.Quantity__c;
+        itemDTO.unitPrice = item.Unit_price__c;
+        itemDTO.totalPrice = item.Total_price__c;
+        itemDTO.description = item.Description__c;
+        itemDTO.size = item.Size__c;
+        itemDTO.color = item.Color__c;
+        itemDTO.productName = item.Name; 
+
+        itemsByProductId.get(item.Product2Id__c).add(itemDTO);
     }
 
         //insert promotion
@@ -36,7 +50,7 @@ public with sharing class RuleEngineTest {
         );
         insert promotion;
     Test.startTest();
-        PromotionEligibilityResult result = PromotionRulesEngine.isEligible(order, orderItemsByProductId, promotions[0]);
+        PromotionEligibilityResult result = PromotionRulesEngine.isEligible(cartDTO,itemsByProductId , promotions[0]);
         System.assertEquals(true, result.isEligible, 'Order should be eligible for the promotion');
         System.assertEquals(0, result.failureReasons.size(), 'There should be no failure reasons');
     Test.stopTest();
@@ -54,13 +68,29 @@ public with sharing class RuleEngineTest {
     List<Product2> products = TestsSetUp.createProducts();
     Order__c order = TestsSetUp.createOrder();
     List<Order_item__c> orderItems = TestsSetUp.createOrderItems(order, products);
-     Map<Id,List<Order_item__c>> orderItemsByProductId = new Map<Id,List<Order_item__c>>();
-    for(Order_item__c item : orderItems){
-        if(!orderItemsByProductId.containsKey(item.Product2Id__c)){
-            orderItemsByProductId.put(item.Product2Id__c, new List<Order_item__c>());
+
+     CartDTO cartDTO = new CartDTO();
+        cartDTO.totalAmount = order.SubTotal__c;
+        cartDTO.couponCode = new List<String>();
+        cartDTO.items = OrderItemService.convertOrderItemsToDTO(orderItems);
+
+        Map<String,List<ItemDTO>> itemsByProductId = new Map<String,List<ItemDTO>>();
+        for(Order_item__c item : orderItems){
+            if(!itemsByProductId.containsKey(item.Product2Id__c)){
+                itemsByProductId.put(item.Product2Id__c, new List<ItemDTO>());
+            }
+            ItemDTO itemDTO = new ItemDTO();
+            itemDTO.productId = item.Product2Id__c;
+            itemDTO.quantity = item.Quantity__c;
+            itemDTO.unitPrice = item.Unit_price__c;
+            itemDTO.totalPrice = item.Total_price__c;
+            itemDTO.description = item.Description__c;
+            itemDTO.size = item.Size__c;
+            itemDTO.color = item.Color__c;
+            itemDTO.productName = item.Name;
+            itemsByProductId.get(item.Product2Id__c).add(itemDTO);
         }
-        orderItemsByProductId.get(item.Product2Id__c).add(item);
-    }
+
         RecordType rt = [SELECT Id FROM RecordType WHERE SObjectType='Promotion__c' AND Name = 'order_level' LIMIT 1];
         Promotion__c promotion1 = new Promotion__c (
             Name='Order level promo with min amount',
@@ -78,7 +108,7 @@ public with sharing class RuleEngineTest {
         FROM Promotion__c
         WHERE Id = :promotion1.Id];
         Test.startTest();
-        PromotionEligibilityResult result = PromotionRulesEngine.isEligible(order, orderItemsByProductId, promotion);
+        PromotionEligibilityResult result = PromotionRulesEngine.isEligible(cartDTO,itemsByProductId, promotion);
         Test.stopTest();
         System.debug('from testing engine:'+result.isEligible);
         System.debug('from testing engine:'+result.failureReasons);
