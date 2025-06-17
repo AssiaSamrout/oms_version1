@@ -12,7 +12,7 @@ public with sharing class CouponValidationService {
             if(coupon == null){
      
             result.isValid = false;
-                result.errorMessages = new List<String>();
+            result.errorMessages = new List<String>();
             result.errorMessages.add('Coupon not found');
             result.coupon = null;
             result.promotion = null;

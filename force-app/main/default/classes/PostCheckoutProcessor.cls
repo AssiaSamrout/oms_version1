@@ -3,7 +3,7 @@ public with sharing class PostCheckoutProcessor {
      * This class processes post-checkout operations for an order, applying promotions and updating the order.
      * It validates coupons, retrieves applicable promotions, and applies them to the order and its items.
      * The results of the processing are returned in a PromotionsCheckoutResult object.
-     * 
+     *  
      * @param order The order to process.
      * @param orderItems The list of order items associated with the order.
      * @param couponCodes The list of coupon codes to apply.

@@ -7,7 +7,7 @@
 */
 
 public with sharing class OrderResponseWrapper {
-    
+     
     public String orderName;
     public String orderDate;
     public String accountId;
@@ -18,7 +18,7 @@ public with sharing class OrderResponseWrapper {
     public String poDate;
     public Decimal orderAmount;
     public String status;
-    public List<ItemDTO> items;
+    public List<ProductDTO> items;
     public List<Adjustment> adjustments;
     public Payment payment;
     public String shippingMethod;

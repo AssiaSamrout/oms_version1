@@ -3,7 +3,7 @@ public with sharing class PromotionsCheckoutResult {
    public String successMessage { get; set; }
    public List<String> failureReasons { get; set; }
    public Integer statusCode { get; set; }
-
+ 
    public PromotionsCheckoutResult() {
        this.isValid = true;
        this.successMessage = '';

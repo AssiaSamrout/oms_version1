@@ -10,7 +10,7 @@ public with sharing class PromotionRuleCacheHelper {
         if(ruleClassName == null || String.isBlank(ruleClassName)){
             throw new IllegalArgumentException('Rule class name cannot be null or empty');
         }
-
+ 
         if(RULECACHE.containsKey(ruleClassName)){
             return RULECACHE.get(ruleClassName);
         }

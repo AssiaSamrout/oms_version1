@@ -35,9 +35,9 @@ public with sharing class OrderItemCreationTest {
        
     @isTest
     static void testInsertOrderItemsNormalFlow(){
-        List<ItemDTO> items = new List<ItemDTO>();
+        List<ProductDTO> items = new List<ProductDTO>();
         for(Integer i = 0; i < 3; i++){
-            ItemDTO item = new ItemDTO();
+            ProductDTO item = new ProductDTO();
             item.sku = 'SKU'+(i+1);
             item.productName = 'Test Product'+(i+1);
             item.quantity = 1;
@@ -71,8 +71,8 @@ public with sharing class OrderItemCreationTest {
 
     @isTest
     static void testOrderItemsWrongData(){
-      List<ItemDTO> items = new List<ItemDTO>();
-        ItemDTO item = new ItemDTO();
+      List<ProductDTO> items = new List<ProductDTO>();
+        ProductDTO item = new ProductDTO();
         item.sku = 'SKU1';
         item.productName = 'Test Product';
         item.quantity = 1;
@@ -90,11 +90,11 @@ public with sharing class OrderItemCreationTest {
         
         Test.stopTest();
     }
-
+ 
     @isTest
     static void testOrderIteminvalidSKU(){
-        List<ItemDTO> items = new List<ItemDTO>();
-        ItemDTO item = new ItemDTO();
+        List<ProductDTO> items = new List<ProductDTO>();
+        ProductDTO item = new ProductDTO();
         item.sku = 'fffff';
         item.productName = 'Test Product';
         item.quantity = 1;
@@ -118,7 +118,7 @@ public with sharing class OrderItemCreationTest {
 
     @isTest
     static void testInsertOrderItemsInvalidSKU(){
-        ItemDTO item = new ItemDTO();
+        ProductDTO item = new ProductDTO();
         item.sku = '';
         item.productName = 'Test Product';
         item.quantity = 1;
@@ -132,7 +132,7 @@ public with sharing class OrderItemCreationTest {
 
         Test.startTest();
         try {
-           OrderItemService.InsertResult result = OrderItemService.insertOrderItems(new List<ItemDTO>{item}, orderId);
+           OrderItemService.InsertResult result = OrderItemService.insertOrderItems(new List<ProductDTO>{item}, orderId);
             System.assert(false, 'Expected IllegalArgumentException for blank SKU');
         } catch (IllegalArgumentException e) {
             System.assertEquals('SKU cannot be blank', e.getMessage(),'exception thrown');

@@ -9,7 +9,7 @@ private class OrderServiceTest {
         Account account = new Account(Name='Test Account');
         insert account;
 
-        ItemDTO item = new ItemDTO();
+        ProductDTO item = new ProductDTO();
         item.sku = sku;
         item.productName = 'Test Product';
         item.quantity = 2;
@@ -53,7 +53,7 @@ private class OrderServiceTest {
         wrapper.orderAmount = 100.0;
         wrapper.status = 'Draft';
         wrapper.shippingMethod = 'Standard';
-        wrapper.items = new List<ItemDTO>{ item };
+        wrapper.items = new List<ProductDTO>{ item };
         wrapper.billingInfo = billingInfo;
         wrapper.customer = customer;
         wrapper.payment = payment;
@@ -66,7 +66,7 @@ private class OrderServiceTest {
         Product2 product = new Product2(Name='Product ' + sku, StockKeepingUnit=sku, IsActive=true);
         insert product;
     }
-
+ 
     @isTest
     static void testCreateOrdersuccess() {
         OrderResponseWrapper wrapper = buildValidOrderResponse();
@@ -90,7 +90,7 @@ private class OrderServiceTest {
     static void testCreateOrderitemInsertFailure() {
          OrderResponseWrapper wrapper = buildValidOrderResponse();
 
-        ItemDTO badItem = new ItemDTO();
+        ProductDTO badItem = new ProductDTO();
         badItem.sku = 'SKU123';
         badItem.productName = 'Invalid Product';
         badItem.quantity = 1;
@@ -98,7 +98,7 @@ private class OrderServiceTest {
         badItem.totalPrice = 10;
         badItem.description = 'dddddd  ggrgrtbb';
 
-        wrapper.items = new List<ItemDTO>{ badItem };
+        wrapper.items = new List<ProductDTO>{ badItem };
 
         Test.startTest();
         OrderService service = new OrderService();

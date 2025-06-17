@@ -18,6 +18,7 @@ public with sharing class CartDTO {
         this.itemsByProductId = new Map<String,List<ItemDTO>>();
     }
 
+
     public CartDTO(CartWrapper cartWrapper) {
         this.totalAmount = cartWrapper.totalAmount;
         this.accountId = cartWrapper.accountId;
@@ -27,6 +28,25 @@ public with sharing class CartDTO {
         this.items = cartWrapper.items;
         this.itemsByProductId = getItemsByProductId(cartWrapper.items);
     }
+
+    // public CartDTO(Order order, List<OrderItem> orderItems) {
+    //     this.totalAmount = order.SubTotal__c;
+    //     this.cartDate = order.EffectiveDate;
+    //     this.couponCode = new List<String>();
+    //     this.items = new List<ItemDTO>();
+
+    //     for (OrderItem oi : orderItems) {
+    //         ItemDTO dto = new ItemDTO();
+    //         dto.productId = String.valueOf(oi.Product2Id);
+    //         dto.productName = oi.Product2 != null ? oi.Product2.Name : null;
+    //         dto.quantity = oi.Quantity;
+    //         dto.unitPrice = oi.UnitPrice;
+    //         dto.totalPrice = oi.TotalPrice;
+    //         dto.sku = oi.SKU__c; // optional custom field
+    //         dto.description = oi.Description;
+
+    //         this.items.add(dto);
+    //     }}
 
     public Map<String,List<ItemDTO>> getItemsByProductId(List<ItemDTO> items) {
         Map<String,List<ItemDTO>> itemsByProductId = new Map<String,List<ItemDTO>>();

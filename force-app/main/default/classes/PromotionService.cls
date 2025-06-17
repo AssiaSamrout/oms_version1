@@ -8,7 +8,7 @@ public with sharing class PromotionService {
 
         List<Promotion__c> promotions = [
             SELECT Id, Name, Percentage__c, RecordTypeId, RecordType.Name, DiscountValue__c, 
-                   IsAutomatic__c, Type__c, ActiveFrom__c, ActiveTo__c,Description__c,MinAmount__c
+                   IsAutomatic__c, Type__c, ActiveFrom__c, ActiveTo__c,Description__c,MinAmount__c,PriorityNumber__c
             FROM Promotion__c
             WHERE Id = :promotionId
             LIMIT 1
@@ -29,7 +29,7 @@ public with sharing class PromotionService {
 
         return [
             SELECT Id, Name, Percentage__c, RecordTypeId, RecordType.Name, DiscountValue__c, 
-                   IsAutomatic__c, Type__c, ActiveFrom__c, ActiveTo__c,Description__c,MinAmount__c
+                   IsAutomatic__c, Type__c, ActiveFrom__c, ActiveTo__c,Description__c,MinAmount__c,PriorityNumber__c
             FROM Promotion__c
             WHERE Id IN :promotionIds
         ];
@@ -39,7 +39,8 @@ public with sharing class PromotionService {
         if(!Promotion__c.SObjectType.getDescribe().isAccessible()) {
             throw new SecurityException('Promotion object not accessible');
         }
-        return [SELECT Id, Name, Percentage__c, RecordType.Name,MinAmount__c,DiscountValue__c, IsAutomatic__c, Type__c, ActiveFrom__c, activeTo__C,Description__c
+        return [SELECT Id, Name, Percentage__c, RecordType.Name,MinAmount__c,DiscountValue__c, 
+        IsAutomatic__c, Type__c, ActiveFrom__c, activeTo__C,Description__c,PriorityNumber__c
                 FROM Promotion__c
                 WHERE IsAutomatic__c = true
                 AND ActiveFrom__c <= :Date.today()
@@ -58,7 +59,7 @@ public with sharing class PromotionService {
 
         return [
             SELECT Id, Name, Percentage__c, RecordTypeId, RecordType.Name, DiscountValue__c, 
-                   IsAutomatic__c, Type__c, ActiveFrom__c, ActiveTo__c,Description__c,MinAmount__c
+                   IsAutomatic__c, Type__c, ActiveFrom__c, ActiveTo__c,Description__c,MinAmount__c,PriorityNumber__c
             FROM Promotion__c
             WHERE (
                    Id IN :promotionIds

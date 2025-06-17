@@ -1,4 +1,4 @@
-public with sharing class AdjustmentDTO {
+public with sharing class AdjustmentDTO { 
     public Order__c order {get;set;}
     public List<Order_item__c> orderItems {get;set;}
     public Promotion__c promotion {get;set;}
@@ -49,8 +49,6 @@ public with sharing class AdjustmentDTO {
             itemDTO.unitPrice = item.Unit_price__c;
             itemDTO.totalPrice = item.Total_price__c;
             itemDTO.description = item.Description__c;
-            itemDTO.size = item.Size__c;
-            itemDTO.color = item.Color__c;
 
             itemsByProductId.get(item.Product2Id__c).add(itemDTO);
             //itemsByProductId.get(item.Product2Id__c).add(new ItemDTO(item));

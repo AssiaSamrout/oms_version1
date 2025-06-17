@@ -38,6 +38,7 @@ public with sharing class OrderLevelPromotionHandlerTest {
 
         System.assertEquals(true, promoEligibility.isEligible, 'Promotion should be eligible');
         System.assertEquals(0, promoEligibility.failureReasons.size(), 'No failure reasons should be present');
+        
 
     }
 

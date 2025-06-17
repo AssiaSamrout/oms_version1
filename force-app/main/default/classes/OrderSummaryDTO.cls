@@ -1,4 +1,4 @@
-public with sharing class OrderSummaryDTO {
+
     /**
  * A Data Transfer Object (DTO) to encapsulate a summary of order-related data,
  * including adjustments, items, couponUsage count, and total adjustment amount.
@@ -7,6 +7,7 @@ public with sharing class OrderSummaryDTO {
  * reduce coupling and have one source of truth for adding and adjusting order data.
  */
 public with sharing class OrderSummaryDTO {
+
 
     /**
      * A list of order adjustment records associated with the order.
@@ -38,6 +39,8 @@ public with sharing class OrderSummaryDTO {
     public OrderSummaryDTO() {
         this.orderAdjustments = new List<Order_adjustment__c>();
         this.orderItems = new List<Order_item__c>();
+        this.couponUsage = 0; // Initialize couponUsage to 0
+        this.totalAdjustments = 0; // Initialize totalAdjustments to 0
         // couponUsage and totalAdjustments will be initialized to their default values (0 for Integer, null for Decimal)
         // or can be explicitly set if a default non-zero value is desired.
     }
@@ -61,7 +64,11 @@ public with sharing class OrderSummaryDTO {
         this.totalAdjustments = initialTotalAdjustments;
     }
 
+    public void addOrderAdjustment(Order_adjustment__c adjustment) {
+        if (adjustment != null) {
+            this.orderAdjustments.add(adjustment);
+        }
+    }
    
 }
 
-}

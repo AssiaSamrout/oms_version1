@@ -4,6 +4,7 @@
     * This class is used to encapsulate the response structure for order details.
     * It includes information about the order, customer, billing info, items, adjustments, and payment.
     * It is designed to be used in conjunction with the OrderService and OrderRepository classes
+    
 */
 public with sharing class OrderItemService {
 
@@ -12,7 +13,7 @@ public with sharing class OrderItemService {
         public List<String> errors = new List<String>();
     }
 
-    public static InsertResult insertOrderItems(List<ItemDTO> items, Id orderId) {
+    public static InsertResult insertOrderItems(List<ProductDTO> items, Id orderId) {
         if (!Order_item__c.SObjectType.getDescribe().isCreateable()) {
             throw new SecurityException('OrderItem object not creatable');
         }
@@ -20,7 +21,7 @@ public with sharing class OrderItemService {
         validateInput(items);
 
         Set<String> skus = new Set<String>();
-        for (ItemDTO item : items) {
+        for (ProductDTO item : items) {
             skus.add(item.sku);
         }
 
@@ -46,8 +47,8 @@ public with sharing class OrderItemService {
         return result;
     }
 
-    private static void validateInput(List<ItemDTO> items) {
-        for (ItemDTO item : items) {
+    private static void validateInput(List<ProductDTO> items) {
+        for (ProductDTO item : items) {
             if (String.isBlank(item.sku)) {
                 throw new IllegalArgumentException('SKU cannot be blank');
             }
@@ -62,9 +63,9 @@ public with sharing class OrderItemService {
         }
     }
 
-    private static List<Order_item__c> buildOrderItems(List<ItemDTO> items, Map<String, Product2> skuMap, Id orderId) {
+    private static List<Order_item__c> buildOrderItems(List<ProductDTO> items, Map<String, Product2> skuMap, Id orderId) {
         List<Order_item__c> orderItems = new List<Order_item__c>();
-        for (ItemDTO item : items) {
+        for (ProductDTO item : items) {
             Product2 product = skuMap.get(item.sku);
             if (product == null){ 
             continue;
@@ -116,20 +117,18 @@ public with sharing class OrderItemService {
     }
 
     public static List<ItemDTO> convertOrderItemsToDTO(List<Order_item__c> orderitems){
-        List<ItemDTO> itemDTOs = new List<ItemDTO>();
+        List<ItemDTO> productDTOs = new List<ItemDTO>();
         for (Order_item__c orderItem : orderitems) {
-            ItemDTO itemDTO = new ItemDTO();
-            itemDTO.productId = orderItem.Product2Id__c;
-            itemDTO.productName = orderItem.Name;
-            itemDTO.quantity = orderItem.Quantity__c;
-            itemDTO.unitPrice = orderItem.Unit_price__c;
-            itemDTO.totalPrice = orderItem.Total_price__c;
-            itemDTO.description = orderItem.Description__c;
-            itemDTO.size = orderItem.Size__c;
-            itemDTO.color = orderItem.Color__c;
-            itemDTOs.add(itemDTO);
+            ItemDTO item = new ItemDTO();
+            item.productId = orderItem.Product2Id__c;
+            item.productName = orderItem.Name;
+            item.quantity = orderItem.Quantity__c;
+            item.unitPrice = orderItem.Unit_price__c;
+            item.totalPrice = orderItem.Total_price__c;
+            item.description = orderItem.Description__c;
+            productDTOs.add(item);
         }
-        return itemDTOs;
+        return productDTOs;
     }
-
+ 
 }

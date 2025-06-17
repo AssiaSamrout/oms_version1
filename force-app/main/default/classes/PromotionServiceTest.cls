@@ -49,8 +49,6 @@ public with sharing class PromotionServiceTest {
             itemDTO.unitPrice = item.Unit_price__c;
             itemDTO.totalPrice = item.Total_price__c;
             itemDTO.description = item.Description__c;
-            itemDTO.size = item.Size__c;
-            itemDTO.color = item.Color__c;
             itemDTO.productName = item.Name; 
 
             itemsByProductId.get(item.Product2Id__c).add(itemDTO);
@@ -194,7 +192,7 @@ public with sharing class PromotionServiceTest {
         * returns an empty list when a null list is provided.
     */
     @isTest
-    static void testGetPromotionsByIds_nullList() {
+    static void testGetPromotionsByIdsnullList() {
     List<Id> nullList = null;
 
     Test.startTest();
